@@ -52,7 +52,7 @@ describe('MongoDB', function() {
             collection: function(name) {
               return {
                 findOne: function(query, options, cb) {
-                  cb(null, { _id: 1 });
+                  cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
                 }
               };
             },
@@ -68,7 +68,7 @@ describe('MongoDB', function() {
       }
     }));
 
-    Resource.findOne(1, function() {});
+    Resource.findOne("547dfc2bdc1e430000ff13b0", function() {});
   });
 
   describe('.findOne()', function() {
@@ -91,7 +91,7 @@ describe('MongoDB', function() {
                 collection: function(name) {
                   return {
                     findOne: function(query, options, cb) {
-                      cb(null, { _id: 1 });
+                      cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
                     }
                   };
                 }
@@ -101,7 +101,7 @@ describe('MongoDB', function() {
         })]
       });
 
-      Resource.findOne({ id: 1 }, function(err, resource) {
+      Resource.findOne({ id: "547dfc2bdc1e430000ff13b0" }, function(err, resource) {
         if (err) return done(err);
         expect(resource).to.exist();
         done();
@@ -280,7 +280,7 @@ describe('MongoDB', function() {
                 collection: function(name) {
                   return {
                     findOne: function(query, options, cb) {
-                      cb(null, { _id: 1 });
+                      cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
                     },
                     update: function(query, options, cb) {
                       cb();
@@ -371,7 +371,7 @@ describe('MongoDB', function() {
         })]
       });
 
-      Resource({ _id: 1, active: true }).destroy(done);
+      Resource({ _id: "547dfc2bdc1e430000ff13b0", active: true }).destroy(done);
     });
   });
 

@@ -45,7 +45,7 @@ If you'd like to use the mongo client directly, it's available via
 
 **Events**
 
- - `mongodb query` Emitted with `query` argument whenever a `query` is
+ - `mongodb:query` Emitted with `query` argument whenever a `query` is
    received and before it is processed, to allow for transformation.
 
 **Params**
