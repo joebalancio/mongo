@@ -43,13 +43,18 @@ If you'd like to use the mongo client directly, it's available via
 `Resource.mongo` and once connected the collection will be available via
 `Resource.mongo.collection`.
 
+**Events**
+
+ - `mongodb query` Emitted with `query` argument whenever a `query` is
+   received and before it is processed, to allow for transformation.
+
 **Params**
 
 - settings `Object`  
   - url `String` - mongodb connection string  
   - collection `String` - mongodb collection for this resource  
-  - options `Object` - mongodb connection options  
-  - retry `Object` - mongodb connection retry delay in milliseconds
+  - \[options\] `Object` - mongodb connection options  
+  - \[retry\] `Number` - connection retry delay in milliseconds
 (default: 1000)  
   - \[client\] `mongodb.MongoClient` - mongo client instance  
 
