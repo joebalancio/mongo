@@ -29,11 +29,11 @@ describe('MongoDB', function() {
   });
 
   it('logs warning if settings object is not shared', function (done) {
-    var log = console.log;
+    var warn = console.warn;
 
-    console.log = function (message) {
-      console.log = log;
-      expect(message).to.match(/should be shared/);
+    console.warn = function (message) {
+      console.warn = warn;
+      expect(message).to.match(/[warning]/);
       done();
     };
 

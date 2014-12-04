@@ -16,7 +16,8 @@ var User = mio.Resource.extend({
   },
 }, {
   use: [MongoDB({
-    url: 'mongodb://db.example.net:2500'
+    url: 'mongodb://db.example.net:2500',
+    collection: 'Users'
   })]
 });
 ```
@@ -34,7 +35,7 @@ npm install mio-mongo
 <a name="exp_module_mio-mongo"></a>
 ##module.exports(settings) ⏏
 It is recommended to share the same `settings` object between different
-resources so they can share a mongo connection pool.
+resources so they can share the same mongo client and connection pool.
 
 A connection to mongo will be established automatically before any query is
 run.
@@ -56,7 +57,7 @@ If you'd like to use the mongo client directly, it's available via
   - \[options\] `Object` - mongodb connection options  
   - \[retry\] `Number` - connection retry delay in milliseconds
 (default: 1000)  
-  - \[client\] `mongodb.MongoClient` - mongo client instance  
+  - \[client\] `mongodb.MongoClient` - mongo client instance to use  
 
 **Returns**: `function` - returns Mio plugin  
 ## Contributing
