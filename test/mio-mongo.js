@@ -403,7 +403,7 @@ describe('MongoDB', function() {
         })]
       });
 
-      Resource.destroy({ active: true }, done);
+      Resource.remove({ active: true }, done);
     });
   });
 });

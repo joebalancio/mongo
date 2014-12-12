@@ -32,6 +32,28 @@ npm install mio-mongo
 
 ## API Reference
 
+<a name="module_mio-mongo"></a>
+#mio-mongo
+**Example**  
+```javascript
+var mio = require('mio');
+var MongoDB = require('mio-mongo');
+
+var User = mio.Resource.extend({
+  attributes: {
+    id: {
+      primary: true,
+      alias: '_id'
+    }
+  },
+}, {
+  use: [MongoDB({
+    url: 'mongodb://db.example.net:2500',
+    collection: 'Users'
+  })]
+});
+```
+
 <a name="exp_module_mio-mongo"></a>
 ##module.exports(settings) ⏏
 It is recommended to share the same `settings` object between different
@@ -44,11 +66,6 @@ If you'd like to use the mongo client directly, it's available via
 `Resource.mongo` and once connected the collection will be available via
 `Resource.mongo.collection`.
 
-**Events**
-
- - `mongodb:query` Emitted with `query` argument whenever a `query` is
-   received and before it is processed, to allow for transformation.
-
 **Params**
 
 - settings `Object`  
@@ -60,6 +77,34 @@ If you'd like to use the mongo client directly, it's available via
   - \[client\] `mongodb.MongoClient` - mongo client instance to use  
 
 **Returns**: `function` - returns Mio plugin  
+
+
+### Events
+
+<a name="module_mio-mongo..mongodb_query"></a>
+#event: "mongodb:query"
+Emitted with `query` argument whenever a `query` is received and before it
+is processed, to allow for transformation.
+
+**Params**
+
+- query `Object`  
+
+**Scope**: inner event of [mio-mongo](#module_mio-mongo)  
+
+<a name="module_mio-mongo..mongodb_collection"></a>
+#event: "mongodb:collection"
+Emitted whenever a collection of resources is returned.
+
+**Params**
+
+- collection `Array.<mio.Resource>`  
+  - from `Number`  
+  - size `Number`  
+
+**Scope**: inner event of [mio-mongo](#module_mio-mongo)  
+
+
 ## Contributing
 
 Please submit all issues and pull requests to the [mio/mongo](http://github.com/mio/mongo) repository!
