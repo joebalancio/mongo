@@ -14,12 +14,12 @@ var User = mio.Resource.extend({
       alias: '_id'
     }
   },
-}, {
-  use: [MongoDB({
-    url: 'mongodb://db.example.net:2500',
-    collection: 'Users'
-  })]
 });
+
+User.use(MongoDB({
+  url: 'mongodb://db.example.net:2500',
+  collection: 'Users'
+}));
 ```
 
 ## Installation
@@ -46,12 +46,12 @@ var User = mio.Resource.extend({
       alias: '_id'
     }
   },
-}, {
-  use: [MongoDB({
-    url: 'mongodb://db.example.net:2500',
-    collection: 'Users'
-  })]
 });
+
+User.use(MongoDB({
+  url: 'mongodb://db.example.net:2500',
+  collection: 'Users'
+}));
 ```
 
 <a name="exp_module_mio-mongo"></a>

@@ -68,7 +68,7 @@ describe('MongoDB', function() {
       }
     }));
 
-    Resource.findOne("547dfc2bdc1e430000ff13b0", function() {});
+    Resource.get("547dfc2bdc1e430000ff13b0", function() {});
   });
 
   describe('.findOne()', function() {
@@ -101,7 +101,7 @@ describe('MongoDB', function() {
         })]
       });
 
-      Resource.findOne({ id: "547dfc2bdc1e430000ff13b0" }, function(err, resource) {
+      Resource.get({ id: "547dfc2bdc1e430000ff13b0" }, function(err, resource) {
         if (err) return done(err);
         expect(resource).to.exist();
         done();
@@ -140,7 +140,7 @@ describe('MongoDB', function() {
         })]
       });
 
-      Resource.find({ active: true }, function(err, resources) {
+      Resource.Collection.get({ active: true }, function(err, resources) {
         if (err) return done(err);
         expect(resources).to.be.instanceOf(Array);
         expect(resources[0]).to.have.property('active', true);
@@ -181,45 +181,10 @@ describe('MongoDB', function() {
         })]
       });
 
-      Resource.find({ active: true }, function(err, resources) {
+      Resource.Collection.get({ active: true }, function(err, resources) {
         if (err) return done(err);
         expect(resources).to.be.instanceOf(Array);
         expect(resources[0]).to.have.property('id', 123);
-        done();
-      });
-    });
-  });
-
-  describe('.count()', function() {
-    it('counts resources', function(done) {
-      var Resource = mio.Resource.extend({
-        attributes: {
-          active: { default: false }
-        },
-      }, {
-        use: [MongoDB({
-          url: "localhost",
-          collection: "users",
-          client: {
-            connect: function (url, opts, cb) {
-              cb(null, {
-                on: function() {},
-                collection: function(name) {
-                  return {
-                    count: function(query, options, cb) {
-                      cb(null, 3);
-                    }
-                  };
-                }
-              });
-            }
-          }
-        })]
-      });
-
-      Resource.count({ active: true }, function(err, count) {
-        if (err) return done(err);
-        expect(count).to.equal(3);
         done();
       });
     });
@@ -253,7 +218,7 @@ describe('MongoDB', function() {
         })]
       });
 
-      Resource().set({ active: true }).save(function(err, changed) {
+      Resource().set({ active: true }).post(function(err) {
         if (err) return done(err);
         expect(this).to.be.instanceOf(Resource);
         expect(this).to.have.property('active', true);
@@ -293,10 +258,10 @@ describe('MongoDB', function() {
         })]
       });
 
-      Resource.findOne(1, function(err, resource) {
+      Resource.get(1, function(err, resource) {
         if (err) return done(err);
 
-        resource.set({ active: true }).save(function(err, changed) {
+        resource.set({ active: true }).patch(function(err, changed) {
           if (err) return done(err);
           expect(this).to.have.property('active', true);
           done();
@@ -322,7 +287,7 @@ describe('MongoDB', function() {
                 on: function() {},
                 collection: function(name) {
                   return {
-                    update: function(query, update, options, cb) {
+                    update: function(query, update, opts, cb) {
                       cb(null, { active: false });
                     }
                   };
@@ -333,7 +298,7 @@ describe('MongoDB', function() {
         })]
       });
 
-      Resource.update(
+      Resource.Collection.patch(
         { active: true },
         { $set: { active: false } },
         function(err, changes) {
@@ -371,7 +336,7 @@ describe('MongoDB', function() {
         })]
       });
 
-      Resource({ _id: "547dfc2bdc1e430000ff13b0", active: true }).destroy(done);
+      Resource({ _id: "547dfc2bdc1e430000ff13b0", active: true }).delete(done);
     });
   });
 
@@ -403,7 +368,7 @@ describe('MongoDB', function() {
         })]
       });
 
-      Resource.remove({ active: true }, done);
+      Resource.Collection.delete({ active: true }, done);
     });
   });
 });
