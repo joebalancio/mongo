@@ -126,11 +126,15 @@ describe('MongoDB', function() {
                 collection: function(name) {
                   return {
                     find: function(query, options) {
-                      return {
+                      var chain = {
+                        sort: function () { return chain; },
+                        skip: function () { return chain; },
+                        limit: function () { return chain; },
                         toArray: function (cb) {
                           cb(null, [{ active: true }]);
                         }
                       };
+                      return chain;
                     }
                   };
                 }
@@ -167,11 +171,15 @@ describe('MongoDB', function() {
                 collection: function(name) {
                   return {
                     find: function(query, options) {
-                      return {
+                      var chain = {
+                        sort: function () { return chain; },
+                        skip: function () { return chain; },
+                        limit: function () { return chain; },
                         toArray: function (cb) {
                           cb(null, [{ _id: 123, nested: { nested: true } }]);
                         }
                       };
+                      return chain;
                     }
                   };
                 }
