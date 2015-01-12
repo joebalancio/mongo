@@ -94,11 +94,12 @@ is processed, to allow for transformation.
 
 <a name="module_mio-mongo..mongodb_collection"></a>
 #event: "mongodb:collection"
-Emitted whenever a collection of resources is returned.
+Emitted whenever a collection of resources is returned. Collections returned
+by `mio-mongo` include `size` and `from` pagination properties.
 
 **Params**
 
-- collection `Array.<mio.Resource>`  
+- collection `Resource.Collection`  
   - from `Number`  
   - size `Number`  
 
