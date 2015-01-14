@@ -198,6 +198,107 @@ describe('MongoDB', function() {
       });
     });
 
+    it('filters by relation', function (done) {
+      var Book = mio.Resource.extend({
+        attributes: {
+          id: { primary: true },
+          name: { required: true }
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function(query, options) {
+            return {
+              limit: function () {},
+              toArray: function (cb) {
+                cb(null, [{
+                  id: "647dfc2bdc1e430000ff13c1",
+                  name: "test"
+                }]);
+              }
+            }
+          },
+          findOne: function(query, options, cb) {
+            cb(null, {
+              id: "647dfc2bdc1e430000ff13c1",
+              name: "test"
+            });
+          }
+        })]
+      });
+
+      var Author = mio.Resource.extend({
+        attributes: {
+          id: { primary: true },
+          name: { required: true }
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function(query, options) {
+            return {
+              limit: function () {},
+              toArray: function (cb) {
+                expect(query).to.be.an('object');
+
+                cb(null, [{
+                  id: "547dfc2bdc1e430000ff13b0",
+                  name: "alex"
+                }]);
+              }
+            };
+          }
+        })]
+      });
+
+      var Authorship = mio.Resource.extend({
+        attributes: {
+          id: { primary: true },
+          author_id: {},
+          book_id: {}
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function (query, options) {
+            return {
+              limit: function () {},
+              toArray: function (cb) {
+                cb(null, [{
+                  id: '147dfc2bdc1e430000ff13b5',
+                  author_id: '547dfc2bdc1e430000ff13b0',
+                  book_id: '647dfc2bdc1e430000ff13c1'
+                }]);
+              }
+            };
+          }
+        })]
+      }).belongsTo('book', {
+          target: Book,
+          foreignKey: 'book_id'
+        })
+        .belongsTo('author', {
+          target: Author,
+          foreignKey: 'author_id'
+        });
+
+      Book.hasMany('authorships', {
+        target: Authorship,
+        foreignKey: 'book_id',
+        nested: true
+      });
+
+      Book.get()
+        .where({ 'authorships.author.name': 'alex' })
+        .withRelated('authorships')
+        .exec(function (err, book) {
+          if (err) return done(err);
+
+          expect(book).to.be.an('object');
+          expect(book).to.have.property('authorships');
+          expect(book.authorships).to.be.an('object');
+
+          done();
+        });
+    });
+
     it('includes related collection', function (done) {
       var Book = mio.Resource.extend({
         attributes: {
@@ -589,6 +690,170 @@ describe('MongoDB', function() {
       });
     });
 
+    it('filters by relation', function (done) {
+      var Book = mio.Resource.extend({
+        attributes: {
+          id: { primary: true },
+          name: { required: true },
+          editor_id: {}
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function(query, options) {
+            return {
+              limit: function () {},
+              toArray: function (cb) {
+                cb(null, [{
+                  id: "647dfc2bdc1e430000ff13c1",
+                  name: "test"
+                }]);
+              }
+            }
+          },
+          findOne: function(query, options, cb) {
+            cb(null, {
+              id: "647dfc2bdc1e430000ff13c1",
+              name: "test"
+            });
+          }
+        })]
+      });
+
+      var Author = mio.Resource.extend({
+        attributes: {
+          id: { primary: true },
+          name: { required: true }
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function(query, options) {
+            return {
+              limit: function () {},
+              toArray: function (cb) {
+                expect(query).to.be.an('object');
+
+                cb(null, [{
+                  id: "547dfc2bdc1e430000ff13b0",
+                  name: "alex"
+                }]);
+              }
+            };
+          }
+        })]
+      });
+
+      var Certification = mio.Resource.extend({
+        attributes: {
+          id: { primary: true },
+          book_id: {},
+          active: false
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function (query, options) {
+            return {
+              limit: function () {},
+              toArray: function (cb) {
+                cb(null, [{
+                  id: '873dfc2bdc1e430000ff13u8',
+                  book_id: '647dfc2bdc1e430000ff13c1'
+                }]);
+              }
+            };
+          }
+        })]
+      });
+
+      var Review = mio.Resource.extend({
+        attributes: {
+          id: { primary: true },
+          authorship_id: {}
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function (query, options) {
+            return {
+              limit: function () {},
+              toArray: function (cb) {
+                cb(null, [{
+                  id: 'uh7dfc2bdc1e430000ff1888',
+                  authorship_id: '147dfc2bdc1e430000ff13b5',
+                }]);
+              }
+            };
+          }
+        })]
+      });
+
+      var Authorship = mio.Resource.extend({
+        attributes: {
+          id: { primary: true },
+          author_id: {},
+          book_id: {}
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function (query, options) {
+            return {
+              limit: function () {},
+              toArray: function (cb) {
+                cb(null, [{
+                  id: '147dfc2bdc1e430000ff13b5',
+                  author_id: '547dfc2bdc1e430000ff13b0',
+                  book_id: '647dfc2bdc1e430000ff13c1'
+                }]);
+              }
+            };
+          }
+        })]
+      }).belongsTo('book', {
+          target: Book,
+          foreignKey: 'book_id'
+        })
+        .belongsTo('author', {
+          target: Author,
+          foreignKey: 'author_id'
+        })
+        .hasMany('reviews', {
+          target: Review,
+          foreignKey: 'authorship_id'
+        });
+
+      Book
+        .hasMany('authorships', {
+          target: Authorship,
+          foreignKey: 'book_id',
+          nested: true
+        })
+        .belongsTo('editor', {
+          target: Author,
+          foreignKey: 'editor_id'
+        })
+        .hasOne('certification', {
+          target: Certification,
+          foreignKey: 'book_id'
+        });
+
+      Book.Collection.get()
+        .where({
+          'authorships.author.name': 'alex',
+          'editor.name': 'bob',
+          'certification.active': true
+        })
+        .exec(function (err, books) {
+          if (err) return done(err);
+
+          expect(books).to.be.instanceOf(Book.Collection);
+
+          var book = books.at(0);
+
+          expect(book).to.be.an('object');
+          expect(book).to.have.property('authorships');
+
+          done();
+        });
+    });
+
     it('includes related resource', function (done) {
       var Book = mio.Resource.extend({
         attributes: {
@@ -941,7 +1206,7 @@ describe('MongoDB', function() {
   });
 
   describe('.create()', function() {
-    it('creates resource', function(done) {
+    it('creates resource from POST', function(done) {
       var Resource = mio.Resource.extend({
         attributes: {
           _id: { primary: true },
@@ -975,10 +1240,45 @@ describe('MongoDB', function() {
         done();
       });
     });
+
+    it('creates resource from PUT', function(done) {
+      var Resource = mio.Resource.extend({
+        attributes: {
+          _id: { primary: true },
+          active: { default: false }
+        },
+      }, {
+        use: [MongoDB({
+          url: "localhost",
+          collection: "users",
+          client: {
+            connect: function (url, opts, cb) {
+              cb(null, {
+                on: function() {},
+                collection: function(name) {
+                  return {
+                    insert: function(query, options, cb) {
+                      cb(null, [{ _id: 1, active: true }]);
+                    }
+                  };
+                }
+              });
+            }
+          }
+        })]
+      });
+
+      Resource().set({ active: true }).put(function(err) {
+        if (err) return done(err);
+        expect(this).to.be.instanceOf(Resource);
+        expect(this).to.have.property('active', true);
+        done();
+      });
+    });
   });
 
   describe('.update()', function() {
-    it('updates resource', function(done) {
+    it('updates resource from PATCH', function(done) {
       var Resource = mio.Resource.extend({
         attributes: {
           _id: { primary: true },
@@ -1012,6 +1312,47 @@ describe('MongoDB', function() {
         if (err) return done(err);
 
         resource.set({ active: true }).patch(function(err, changed) {
+          if (err) return done(err);
+          expect(this).to.have.property('active', true);
+          done();
+        });
+      });
+    });
+
+    it('updates resource from PUT', function(done) {
+      var Resource = mio.Resource.extend({
+        attributes: {
+          _id: { primary: true },
+          active: { default: false }
+        },
+      }, {
+        use: [MongoDB({
+          url: "localhost",
+          collection: "users",
+          client: {
+            connect: function (url, opts, cb) {
+              cb(null, {
+                on: function() {},
+                collection: function(name) {
+                  return {
+                    findOne: function(query, options, cb) {
+                      cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
+                    },
+                    update: function(query, options, cb) {
+                      cb();
+                    }
+                  };
+                }
+              });
+            }
+          }
+        })]
+      });
+
+      Resource.get(1, function(err, resource) {
+        if (err) return done(err);
+
+        resource.set({ active: true }).put(function(err, changed) {
           if (err) return done(err);
           expect(this).to.have.property('active', true);
           done();

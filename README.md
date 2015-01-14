@@ -2,28 +2,6 @@
 
 > MongoDB storage plugin for Mio.
 
-**Example**  
-```javascript
-var mio = require('mio');
-var MongoDB = require('mio-mongo');
-
-var User = mio.Resource.extend({
-  attributes: {
-    id: {
-      primary: true,
-      alias: '_id'
-    }
-  },
-});
-
-User.use(MongoDB({
-  url: 'mongodb://db.example.net:2500',
-  collection: 'Users'
-}));
-```
-
-## Installation
-
 Install using [npm](https://www.npmjs.org/):
 
 ```sh
@@ -35,6 +13,8 @@ npm install mio-mongo
 <a name="module_mio-mongo"></a>
 #mio-mongo
 **Example**  
+Basic usage:
+
 ```javascript
 var mio = require('mio');
 var MongoDB = require('mio-mongo');
@@ -45,13 +25,50 @@ var User = mio.Resource.extend({
       primary: true,
       alias: '_id'
     }
-  },
+  }
 });
 
 User.use(MongoDB({
   url: 'mongodb://db.example.net:2500',
   collection: 'Users'
 }));
+
+User.Collection.get()
+  .where({ active: true })
+  .sort({ createdAt: 1 })
+  .exec(function (err, users) {
+    users.at(0).set({ active: false }).patch(function (err) {
+      // ...
+    });
+  });
+```
+
+Relational queries and aggregation (joins) are supported:
+
+```javascript
+Post.belongsTo('author', {
+  target: User,
+  foreignKey: 'authorId'
+});
+
+User.hasMany('posts', {
+  target: Post,
+  foreignKey: 'authorId'
+});
+
+// fetch posts for user `123`
+Post.Collection.get()
+  .where({ 'author.id': 123 })
+  .exec(function (err, posts) {
+    // ...
+  });
+
+// fetch users with their posts included
+User.Collection.get()
+  .withRelated('posts')
+  .exec(function (err, users) {
+    users.pop().posts;
+  });
 ```
 
 <a name="exp_module_mio-mongo"></a>
