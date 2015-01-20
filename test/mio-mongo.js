@@ -67,7 +67,7 @@ describe('MongoDB', function() {
       collection: "test",
       client: {
         connect: function (url, opts, cb) {
-          expect(Resource.mongo).to.have.property('connecting', true);
+          expect(Resource.options.mongo.client).to.have.property('connecting', true);
           cb(null, {
             collection: function(name) {
               return {
@@ -79,7 +79,7 @@ describe('MongoDB', function() {
             on: function (ev, handler) {
               if (ev === 'close') {
                 handler();
-                expect(Resource.mongo).to.have.property('connected', false);
+                expect(Resource.options.mongo.client).to.have.property('connected', false);
                 done();
               }
             }
