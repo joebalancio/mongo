@@ -29,7 +29,7 @@ var User = mio.Resource.extend({
 });
 
 User.use(MongoDB({
-  url: 'mongodb://db.example.net:2500',
+  connectionString: 'mongodb://db.example.net:2500',
   collection: 'Users'
 }));
 
@@ -73,25 +73,25 @@ User.Collection.get()
 
 <a name="exp_module_mio-mongo"></a>
 ##module.exports(settings) ⏏
-It is recommended to share the same `settings` object between different
-resources so they can share the same mongo client and connection pool.
+It is recommended to share the same `settings.db` object between
+different resources so they can share the same mongo client and connection
+pool.
 
 A connection to mongo will be established automatically before any query is
 run.
 
-If you'd like to use the mongo client directly, it's available via
-`Resource.mongo` and once connected the collection will be available via
-`Resource.mongo.collection`.
+If you'd like to use the mongo client directly, the `db` is available via
+`Resource.options.mongo.db`.
 
 **Params**
 
 - settings `Object`  
-  - url `String` - mongodb connection string  
   - collection `String` - mongodb collection for this resource  
-  - \[options\] `Object` - mongodb connection options  
-  - \[retry\] `Number` - connection retry delay in milliseconds
-(default: 1000)  
-  - \[client\] `mongodb.MongoClient` - mongo client instance to use  
+  - \[connectionString\] `String` - mongodb connection string. required
+if `settings.db` is not provided.  
+  - \[connectionOptions\] `Object` - mongodb connection options  
+  - \[db\] `mongodb.MongoClient.Db` - reuse node-mongo-native db
+connection  
 
 **Returns**: `function` - returns Mio plugin  
 

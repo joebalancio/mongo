@@ -15,15 +15,11 @@ function MongoDbStub(methods) {
   }
 
   return MongoDB({
+    connectionString: 'localhost',
     collection: 'test',
-    client: {
-      connect: function (url, opts, cb) {
-        cb(null, {
-          collection: function (name) {
-            return methods;
-          },
-          on: function () {}
-        });
+    db: {
+      collection: function (name) {
+        return methods;
       }
     }
   });
@@ -45,50 +41,7 @@ describe('MongoDB', function() {
   it('requires collection name', function () {
     expect(function() {
       mio.Resource.extend().use(MongoDB({}));
-    }).to.throw(/a collection/);
-  });
-
-  it('logs warning if settings object is not shared', function (done) {
-    var warn = console.warn;
-
-    console.warn = function (message) {
-      console.warn = warn;
-      expect(message).to.match(/[warning]/);
-      done();
-    };
-
-    mio.Resource.extend().use(MongoDB({
-      collection: "test"
-    }));
-  });
-
-  it('listens for db "close" event', function (done) {
-    var Resource = mio.Resource.extend().use(MongoDB({
-      collection: "test",
-      client: {
-        connect: function (url, opts, cb) {
-          expect(Resource.options.mongo.client).to.have.property('connecting', true);
-          cb(null, {
-            collection: function(name) {
-              return {
-                findOne: function(query, options, cb) {
-                  cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
-                }
-              };
-            },
-            on: function (ev, handler) {
-              if (ev === 'close') {
-                handler();
-                expect(Resource.options.mongo.client).to.have.property('connected', false);
-                done();
-              }
-            }
-          });
-        }
-      }
-    }));
-
-    Resource.get("547dfc2bdc1e430000ff13b0", function() {});
+    }).to.throw(/connectionString or db/);
   });
 
   describe('.findOne()', function() {
@@ -610,28 +563,23 @@ describe('MongoDB', function() {
         },
       }, {
         use: [MongoDB({
-          url: "localhost",
+          connectionString: "localhost",
           collection: "users",
-          client: {
-            connect: function (url, opts, cb) {
-              cb(null, {
-                on: function() {},
-                collection: function(name) {
-                  return {
-                    find: function(query, options) {
-                      var chain = {
-                        sort: function () { return chain; },
-                        skip: function () { return chain; },
-                        limit: function () { return chain; },
-                        toArray: function (cb) {
-                          cb(null, [{ active: true }]);
-                        }
-                      };
-                      return chain;
+          db: {
+            collection: function(name) {
+              return {
+                find: function(query, options) {
+                  var chain = {
+                    sort: function () { return chain; },
+                    skip: function () { return chain; },
+                    limit: function () { return chain; },
+                    toArray: function (cb) {
+                      cb(null, [{ active: true }]);
                     }
                   };
+                  return chain;
                 }
-              });
+              };
             }
           }
         })]
@@ -655,28 +603,23 @@ describe('MongoDB', function() {
         },
       }, {
         use: [MongoDB({
-          url: "localhost",
+          connectionString: "localhost",
           collection: "users",
-          client: {
-            connect: function (url, opts, cb) {
-              cb(null, {
-                on: function() {},
-                collection: function(name) {
-                  return {
-                    find: function(query, options) {
-                      var chain = {
-                        sort: function () { return chain; },
-                        skip: function () { return chain; },
-                        limit: function () { return chain; },
-                        toArray: function (cb) {
-                          cb(null, [{ _id: 123, nested: { nested: true } }]);
-                        }
-                      };
-                      return chain;
+          db: {
+            collection: function(name) {
+              return {
+                find: function(query, options) {
+                  var chain = {
+                    sort: function () { return chain; },
+                    skip: function () { return chain; },
+                    limit: function () { return chain; },
+                    toArray: function (cb) {
+                      cb(null, [{ _id: 123, nested: { nested: true } }]);
                     }
                   };
+                  return chain;
                 }
-              });
+              };
             }
           }
         })]
@@ -1214,20 +1157,15 @@ describe('MongoDB', function() {
         },
       }, {
         use: [MongoDB({
-          url: "localhost",
+          connectionString: "localhost",
           collection: "users",
-          client: {
-            connect: function (url, opts, cb) {
-              cb(null, {
-                on: function() {},
-                collection: function(name) {
-                  return {
-                    insert: function(query, options, cb) {
-                      cb(null, [{ _id: 1, active: true }]);
-                    }
-                  };
+          db: {
+            collection: function(name) {
+              return {
+                insert: function(query, options, cb) {
+                  cb(null, [{ _id: 1, active: true }]);
                 }
-              });
+              };
             }
           }
         })]
@@ -1249,20 +1187,15 @@ describe('MongoDB', function() {
         },
       }, {
         use: [MongoDB({
-          url: "localhost",
+          connectionString: "localhost",
           collection: "users",
-          client: {
-            connect: function (url, opts, cb) {
-              cb(null, {
-                on: function() {},
-                collection: function(name) {
-                  return {
-                    insert: function(query, options, cb) {
-                      cb(null, [{ _id: 1, active: true }]);
-                    }
-                  };
+          db: {
+            collection: function(name) {
+              return {
+                insert: function(query, options, cb) {
+                  cb(null, [{ _id: 1, active: true }]);
                 }
-              });
+              };
             }
           }
         })]
@@ -1286,23 +1219,18 @@ describe('MongoDB', function() {
         },
       }, {
         use: [MongoDB({
-          url: "localhost",
+          connectionString: "localhost",
           collection: "users",
-          client: {
-            connect: function (url, opts, cb) {
-              cb(null, {
-                on: function() {},
-                collection: function(name) {
-                  return {
-                    findOne: function(query, options, cb) {
-                      cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
-                    },
-                    update: function(query, options, cb) {
-                      cb();
-                    }
-                  };
+          db: {
+            collection: function(name) {
+              return {
+                findOne: function(query, options, cb) {
+                  cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
+                },
+                update: function(query, options, cb) {
+                  cb();
                 }
-              });
+              };
             }
           }
         })]
@@ -1327,23 +1255,18 @@ describe('MongoDB', function() {
         },
       }, {
         use: [MongoDB({
-          url: "localhost",
+          connectionString: "localhost",
           collection: "users",
-          client: {
-            connect: function (url, opts, cb) {
-              cb(null, {
-                on: function() {},
-                collection: function(name) {
-                  return {
-                    findOne: function(query, options, cb) {
-                      cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
-                    },
-                    update: function(query, options, cb) {
-                      cb();
-                    }
-                  };
+          db: {
+            collection: function(name) {
+              return {
+                findOne: function(query, options, cb) {
+                  cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
+                },
+                update: function(query, options, cb) {
+                  cb();
                 }
-              });
+              };
             }
           }
         })]
@@ -1370,20 +1293,15 @@ describe('MongoDB', function() {
         },
       }, {
         use: [MongoDB({
-          url: "localhost",
+          connectionString: "localhost",
           collection: "users",
-          client: {
-            connect: function (url, opts, cb) {
-              cb(null, {
-                on: function() {},
-                collection: function(name) {
-                  return {
-                    update: function(query, update, opts, cb) {
-                      cb(null, { active: false });
-                    }
-                  };
+          db: {
+            collection: function(name) {
+              return {
+                update: function(query, update, opts, cb) {
+                  cb(null, { active: false });
                 }
-              });
+              };
             }
           }
         })]
@@ -1408,20 +1326,15 @@ describe('MongoDB', function() {
         },
       }, {
         use: [MongoDB({
-          url: "localhost",
+          connectionString: "localhost",
           collection: "users",
-          client: {
-            connect: function (url, opts, cb) {
-              cb(null, {
-                on: function() {},
-                collection: function(name) {
-                  return {
-                    remove: function(query, cb) {
-                      cb();
-                    }
-                  };
+          db: {
+            collection: function(name) {
+              return {
+                remove: function(query, cb) {
+                  cb();
                 }
-              });
+              };
             }
           }
         })]
@@ -1440,20 +1353,15 @@ describe('MongoDB', function() {
         },
       }, {
         use: [MongoDB({
-          url: "localhost",
+          connectionString: "localhost",
           collection: "users",
-          client: {
-            connect: function (url, opts, cb) {
-              cb(null, {
-                on: function() {},
-                collection: function(name) {
-                  return {
-                    remove: function(query, options, cb) {
-                      cb();
-                    }
-                  };
+          db: {
+            collection: function(name) {
+              return {
+                remove: function(query, options, cb) {
+                  cb();
                 }
-              });
+              };
             }
           }
         })]
