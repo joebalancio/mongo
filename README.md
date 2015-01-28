@@ -13,7 +13,7 @@ npm install mio-mongo
 <a name="module_mio-mongo"></a>
 #mio-mongo
 **Example**  
-Basic usage:
+## Basic usage
 
 ```javascript
 var mio = require('mio');
@@ -21,15 +21,15 @@ var MongoDB = require('mio-mongo');
 
 var User = mio.Resource.extend({
   attributes: {
-    id: {
+    _id: {
       primary: true,
-      alias: '_id'
+      objectId: true
     }
   }
 });
 
 User.use(MongoDB({
-  connectionString: 'mongodb://db.example.net:2500',
+  url: 'mongodb://db.example.net:2500',
   collection: 'Users'
 }));
 
@@ -43,7 +43,7 @@ User.Collection.get()
   });
 ```
 
-Relational queries and aggregation (joins) are supported:
+## Relations
 
 ```javascript
 Post.belongsTo('author', {
@@ -69,6 +69,41 @@ User.Collection.get()
   .exec(function (err, users) {
     users.pop().posts;
   });
+```
+
+## Aliases
+
+```javascript
+var User = mio.Resource.extend({
+  attributes: {
+    name: {
+      alias: 'fullName'
+    }
+  }
+});
+
+// MongoDB query uses "fullName"
+User.find({ name: 'Alex' }).exec(...);
+```
+
+## ObjectId
+
+Automatically stringify and cast ObjectId's by setting `objectId: true`.
+
+```javascript
+var User = mio.Resource.extend({
+  attributes: {
+    companyId: {
+      objectId: true
+    }
+  }
+});
+
+User.find({
+  companyId: '547dfc2bdc1e430000ff13b0'
+}).exec(function (err, user) {
+  console.log(typeof user.companyId); // => "string"
+});
 ```
 
 <a name="exp_module_mio-mongo"></a>
@@ -116,7 +151,7 @@ by `mio-mongo` include `size` and `from` pagination properties.
 
 **Params**
 
-- collection `Resource.Collection`  
+- collection <code>[external:mio.Resource.Collection](external:mio.Resource.Collection)</code>  
   - from `Number`  
   - size `Number`  
 
