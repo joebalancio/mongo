@@ -1227,8 +1227,8 @@ describe('MongoDB', function() {
                 findOne: function(query, options, cb) {
                   cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
                 },
-                update: function(query, options, cb) {
-                  cb();
+                findAndModify: function(query, doc, sort, options, cb) {
+                  cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
                 }
               };
             }
@@ -1263,8 +1263,8 @@ describe('MongoDB', function() {
                 findOne: function(query, options, cb) {
                   cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
                 },
-                update: function(query, options, cb) {
-                  cb();
+                findAndModify: function(query, doc, sort, options, cb) {
+                  cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
                 }
               };
             }
