@@ -1208,6 +1208,61 @@ describe('MongoDB', function() {
         done();
       });
     });
+
+    it('persists defined attributes only', function (done) {
+      var Resource = mio.Resource.extend({
+        attributes: {
+          _id: { primary: true },
+          active: { default: false }
+        },
+      }, {
+        use: [MongoDB({
+          connectionString: "localhost",
+          collection: "users",
+          db: {
+            collection: function(name) {
+              return {
+                insert: function(query, options, cb) {
+                  expect(query).to.have.property('active', true);
+                  expect(query).to.not.have.property('invalid');
+                  expect(query).to.not.have.property('author');
+                  cb(null, [{ _id: 1, active: true }]);
+                }
+              };
+            }
+          }
+        })]
+      });
+
+      var Author = mio.Resource.extend({
+        attributes: {
+          id: { primary: true }
+        }
+      }, {
+        use: [new MongoDbStub({
+          findOne: function (query, options, cb) {
+            cb(null, { id: '647dfc2bdc1e430000ff13c1' });
+          }
+        })]
+      });
+
+      Resource.hasOne('author', {
+        target: Author,
+        foreignKey: 'authorId'
+      });
+
+      var resource = Resource.create();
+      resource.active = true;
+      resource.invalid = true;
+      resource.author = new Author();
+
+      resource.put(function(err) {
+        if (err) return done(err);
+        expect(this).to.be.instanceOf(Resource);
+        expect(this).to.have.property('active', true);
+        done();
+      });
+    });
   });
 
   describe('.update()', function() {
