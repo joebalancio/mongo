@@ -12,8 +12,7 @@ npm install mio-mongo
 
 <a name="module_mio-mongo"></a>
 #mio-mongo
-**Example**  
-## Basic usage
+#### Basic usage
 
 ```javascript
 var mio = require('mio');
@@ -43,7 +42,7 @@ User.Collection.get()
   });
 ```
 
-## Relations
+#### Relations
 
 ```javascript
 Post.belongsTo('author', {
@@ -71,7 +70,7 @@ User.Collection.get()
   });
 ```
 
-## Aliases
+#### Aliases
 
 ```javascript
 var User = mio.Resource.extend({
@@ -86,7 +85,7 @@ var User = mio.Resource.extend({
 User.find({ name: 'Alex' }).exec(...);
 ```
 
-## ObjectId
+#### ObjectId
 
 Automatically stringify and cast ObjectId's by setting `objectId: true`.
 
