@@ -145,6 +145,58 @@ describe('MongoDB', function() {
       });
   });
 
+  it('does not mutate dates in documents or queries', function (done) {
+      var Resource = mio.Resource.extend({
+        attributes: {
+          id: {
+            alias: '_id',
+            objectId: true,
+            primary: true
+          },
+          createdAt: {},
+          updatedAt: {
+            required: true,
+            default: function () {
+              return new Date();
+            }
+          }
+        }
+      }, {
+        use: [new MongoDbStub({
+          findOne: function (query, options, cb) {
+            expect(query).to.have.property('createdAt');
+            expect(query.createdAt).to.be.instanceOf(Date);
+            expect(query).to.have.property('updatedAt');
+            expect(query.updatedAt).to.have.property('$gt');
+            expect(query.updatedAt.$gt).to.be.an('array');
+            expect(query.updatedAt.$gt[0]).to.be.an.instanceOf(Date);
+            cb(null, {
+              _id: new ObjectID('547dfc2bdc1e430000ff13b0'),
+              createdAt: new Date()
+            });
+          }
+        })]
+      });
+
+      Resource.get().where({
+        id: '547dfc2bdc1e430000ff13b0',
+        createdAt: new Date(),
+        updatedAt: {
+          $gt: [new Date()]
+        }
+      }).exec(function (err, resource) {
+        if (err) return done(err);
+
+        expect(resource).to.have.property('id', '547dfc2bdc1e430000ff13b0');
+        expect(resource).to.have.property('createdAt');
+        expect(resource.createdAt).to.be.instanceOf(Date);
+        expect(resource).to.have.property('updatedAt');
+        expect(resource.updatedAt).to.be.instanceOf(Date);
+
+        done();
+      });
+  });
+
   describe('.findOne()', function() {
     it('finds one resource', function(done) {
       var Resource = mio.Resource.extend({
