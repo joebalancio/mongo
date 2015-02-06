@@ -107,42 +107,81 @@ describe('MongoDB', function() {
   });
 
   it('stringifies ObjectIDs when setting resource attributes', function (done) {
-      var Resource = mio.Resource.extend({
-        attributes: {
-          id: {
-            alias: '_id',
-            objectId: true,
-            primary: true
-          },
-          authorId: {
-            objectId: true
-          },
-          reviewId: {
-            alias: 'review_id',
-            objectId: true
-          }
+    var Resource = mio.Resource.extend({
+      attributes: {
+        id: {
+          alias: '_id',
+          objectId: true,
+          primary: true
+        },
+        authorId: {
+          objectId: true
+        },
+        reviewId: {
+          alias: 'review_id',
+          objectId: true
         }
-      }, {
-        use: [new MongoDbStub({
-          findOne: function (query, options, cb) {
-            cb(null, {
-              _id: new ObjectID('547dfc2bdc1e430000ff13b0'),
-              authorId: new ObjectID('647dfc2bdc1e430000ff13c1'),
-              review_id: new ObjectID('147dfc2bdc1e430000ff13b5')
-            });
-          }
-        })]
-      });
+      }
+    }, {
+      use: [new MongoDbStub({
+        findOne: function (query, options, cb) {
+          cb(null, {
+            _id: new ObjectID('547dfc2bdc1e430000ff13b0'),
+            authorId: new ObjectID('647dfc2bdc1e430000ff13c1'),
+            review_id: new ObjectID('147dfc2bdc1e430000ff13b5')
+          });
+        }
+      })]
+    });
 
-      Resource.get('547dfc2bdc1e430000ff13b0', function (err, resource) {
-        if (err) return done(err);
+    Resource.get('547dfc2bdc1e430000ff13b0', function (err, resource) {
+      if (err) return done(err);
 
-        expect(resource).to.have.property('id', '547dfc2bdc1e430000ff13b0');
-        expect(resource).to.have.property('authorId', '647dfc2bdc1e430000ff13c1');
-        expect(resource).to.have.property('reviewId', '147dfc2bdc1e430000ff13b5');
+      expect(resource).to.have.property('id', '547dfc2bdc1e430000ff13b0');
+      expect(resource).to.have.property('authorId', '647dfc2bdc1e430000ff13c1');
+      expect(resource).to.have.property('reviewId', '147dfc2bdc1e430000ff13b5');
 
-        done();
-      });
+      done();
+    });
+  });
+
+  it('does not stringify objectId attributes with null value', function (done) {
+    var Resource = mio.Resource.extend({
+      attributes: {
+        id: {
+          alias: '_id',
+          objectId: true,
+          primary: true
+        },
+        authorId: {
+          objectId: true
+        },
+        reviewId: {
+          alias: 'review_id',
+          objectId: true
+        }
+      }
+    }, {
+      use: [new MongoDbStub({
+        findOne: function (query, options, cb) {
+          cb(null, {
+            _id: new ObjectID('547dfc2bdc1e430000ff13b0'),
+            authorId: null,
+            review_id: new ObjectID('147dfc2bdc1e430000ff13b5')
+          });
+        }
+      })]
+    });
+
+    Resource.get('547dfc2bdc1e430000ff13b0', function (err, resource) {
+      if (err) return done(err);
+
+      expect(resource).to.have.property('id', '547dfc2bdc1e430000ff13b0');
+      expect(resource).to.have.property('authorId', null);
+      expect(resource).to.have.property('reviewId', '147dfc2bdc1e430000ff13b5');
+
+      done();
+    });
   });
 
   it('does not mutate dates in documents or queries', function (done) {
