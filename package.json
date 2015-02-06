@@ -1,7 +1,7 @@
 {
   "name": "mio-mongo",
   "description": "MongoDB storage plugin for Mio.",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "homepage": "https://github.com/mio/mongo",
   "author": {
     "name": "Alex Mingoia",
