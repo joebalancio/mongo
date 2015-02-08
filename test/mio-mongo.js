@@ -1702,6 +1702,147 @@ describe('MongoDB', function() {
     });
   });
 
+  describe('.createMany()', function() {
+    it('creates resources from POST', function(done) {
+      var Resource = mio.Resource.extend({
+        attributes: {
+          _id: { primary: true },
+          active: { default: false }
+        },
+      }, {
+        use: [MongoDB({
+          connectionString: "localhost",
+          collection: "users",
+          db: {
+            collection: function(name) {
+              return {
+                insert: function(query, options, cb) {
+                  cb(null, [
+                    { _id: 1, active: true },
+                    { _id: 2, active: false }
+                  ]);
+                }
+              };
+            }
+          }
+        })]
+      });
+
+      Resource.Collection.post([
+        { active: true },
+        { active: false }
+      ], function (err, collection) {
+        if (err) return done(err);
+        expect(collection).to.be.an('object');
+        expect(collection).to.have.property('length', 2);
+        done();
+      });
+    });
+  });
+
+  describe('.replace()', function() {
+    it('creates resource from PUT', function(done) {
+      var Resource = mio.Resource.extend({
+        attributes: {
+          _id: { primary: true },
+          active: { default: false }
+        },
+      }, {
+        use: [MongoDB({
+          connectionString: "localhost",
+          collection: "users",
+          db: {
+            collection: function(name) {
+              return {
+                insert: function(doc, options, cb) {
+                  cb(null, [{
+                    _id: "547dfc2bdc1e430000ff13b0",
+                    active: true
+                  }]);
+                }
+              };
+            }
+          }
+        })]
+      });
+
+      Resource.create().set({ active: true }).put(function(err, changed) {
+        if (err) return done(err);
+        expect(this).to.have.property('active', true);
+        done();
+      });
+    });
+
+    it('updates resource from PUT', function(done) {
+      var Resource = mio.Resource.extend({
+        attributes: {
+          _id: { primary: true },
+          active: { default: false }
+        },
+      }, {
+        use: [MongoDB({
+          connectionString: "localhost",
+          collection: "users",
+          db: {
+            collection: function(name) {
+              return {
+                findOne: function(query, options, cb) {
+                  cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
+                },
+                findAndModify: function(query, doc, sort, options, cb) {
+                  cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
+                }
+              };
+            }
+          }
+        })]
+      });
+
+      Resource.get(1, function(err, resource) {
+        if (err) return done(err);
+
+        resource.set({ active: true }).put(function(err, changed) {
+          if (err) return done(err);
+          expect(this).to.have.property('active', true);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('.replaceMany()', function() {
+    it('replaces many resources', function(done) {
+      var Resource = mio.Resource.extend({
+        attributes: {
+          _id: { primary: true },
+          active: { default: false }
+        },
+      }, {
+        use: [MongoDB({
+          connectionString: "localhost",
+          collection: "users",
+          db: {
+            collection: function(name) {
+              return {
+                update: function(query, update, opts, cb) {
+                  cb(null, { active: false });
+                }
+              };
+            }
+          }
+        })]
+      });
+
+      Resource.Collection.put(
+        { active: true },
+        { $set: { active: false } },
+        function(err, changes) {
+          if (err) return done(err);
+          done();
+        });
+    });
+  });
+
   describe('.update()', function() {
     it('updates resource from PATCH', function(done) {
       var Resource = mio.Resource.extend({
