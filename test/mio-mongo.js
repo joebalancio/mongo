@@ -1390,6 +1390,136 @@ describe('MongoDB', function() {
         done();
       });
     });
+
+    it('passes query pagination parameters to mongo', function (done) {
+      var Book = mio.Resource.extend({
+        attributes: {
+          id: { primary: true },
+          name: { required: true }
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function(query, options) {
+            expect(options).to.be.an('object');
+            expect(options).to.have.property('skip', 6);
+            expect(options).to.have.property('limit', 100);
+            return {
+              skip: function (skip) {
+                expect(skip).to.equal(6);
+              },
+              limit: function (limit) {
+                expect(limit).to.equal(100);
+              },
+              toArray: function (cb) {
+                cb(null, [{
+                  id: "647dfc2bdc1e430000ff13c1",
+                  name: "test"
+                }]);
+              }
+            }
+          }
+        })]
+      });
+
+      Book.Collection.get().size(101).from(6).exec(done);
+    });
+
+    it('passes relation query parameters to mongo', function (done) {
+      var Book = mio.Resource.extend({
+        attributes: {
+          id: { primary: true },
+          name: { required: true },
+          authorId: { required: true }
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function(query, options) {
+            expect(options).to.be.an('object');
+            expect(options).to.have.property('skip', 6);
+            expect(options).to.have.property('limit', 100);
+            return {
+              skip: function (skip) {
+                expect(skip).to.equal(6);
+              },
+              limit: function (limit) {
+                expect(limit).to.equal(100);
+              },
+              toArray: function (cb) {
+                cb(null, [{
+                  id: '647dfc2bdc1e430000ff13c1',
+                  name: 'test'
+                }]);
+              }
+            }
+          }
+        })]
+      });
+
+      var Review = mio.Resource.extend({
+        attributes: {
+          id: { primary: true },
+          description: { required: true },
+          bookId: { required: true }
+        }
+      }, {
+        defaultPageSize: 70,
+        use: [new MongoDbStub({
+          find: function(query, options) {
+            return {
+              skip: function (skip) {
+                expect(skip).to.equal(10);
+              },
+              limit: function (limit) {
+                expect(limit).to.equal(70);
+              },
+              toArray: function (cb) {
+                var result = [];
+
+                for (var i = 0; i < 70; i++) {
+                  result.push({
+                    id: '547dfc2bdc1e430000ff13b0',
+                    description: 'review',
+                    bookId: '647dfc2bdc1e430000ff13c1'
+                  });
+                }
+
+                cb(null, result);
+              }
+            };
+          }
+        })]
+      });
+
+      Book.hasMany('reviews', {
+        target: Review,
+        foreignKey: 'bookId'
+      });
+
+      Book.Collection.get().withRelated({
+        reviews: {
+          from: 10,
+          size: 70
+        }
+      }).size(101).from(6).exec(function (err, books) {
+        expect(books).to.be.an('object');
+        expect(books).to.be.an.instanceOf(Book.Collection);
+        expect(books).to.have.property('from', 6);
+        expect(books).to.have.property('size', 100);
+        expect(books).to.have.property('length', 1);
+
+        var book = books.at(0);
+
+        expect(book).to.be.an('object');
+        expect(book).to.have.property('reviews');
+        expect(book.reviews).to.be.an('object');
+        expect(book.reviews).to.be.an.instanceOf(Review.Collection);
+        expect(book.reviews).to.have.property('from', 10);
+        expect(book.reviews).to.have.property('size', 70);
+        expect(book.reviews).to.have.property('length', 70);
+
+        done();
+      });
+    });
   });
 
   describe('.create()', function() {
