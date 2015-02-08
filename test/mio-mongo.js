@@ -837,6 +837,69 @@ describe('MongoDB', function() {
       });
     });
 
+    it('transforms sort of "desc" into -1', function (done) {
+      var Resource = mio.Resource.extend({
+        attributes: {
+          id: {
+            alias: '_id'
+          },
+          name: {
+            required: true,
+            default: ''
+          },
+          createdAt: {
+            required: true,
+            default: function () {
+              return new Date();
+            }
+          }
+        },
+      }, {
+        use: [MongoDB({
+          connectionString: "localhost",
+          collection: "users",
+          db: {
+            collection: function(name) {
+              return {
+                find: function(query, options) {
+                  expect(options).to.be.an('object');
+                  expect(options).to.have.property('sort');
+                  expect(options.sort).to.be.an('object');
+                  expect(options.sort).to.have.property('name', -1);
+                  expect(options.sort).to.have.property('createdAt', 1);
+
+                  var chain = {
+                    sort: function () { return chain; },
+                    skip: function () { return chain; },
+                    limit: function () { return chain; },
+                    toArray: function (cb) {
+                      cb(null, [{ _id: 123, nested: { nested: true } }]);
+                    }
+                  };
+                  return chain;
+                }
+              };
+            }
+          }
+        })]
+      });
+
+      Resource.Collection.get()
+        .where({
+          active: true
+        })
+        .sort({
+          name: 'desc',
+          createdAt: 'asc'
+        })
+        .exec(function(err, resources) {
+          if (err) return done(err);
+          expect(resources).to.be.instanceOf(Resource.Collection);
+          expect(resources.at(0)).to.have.property('id', 123);
+          done();
+        });
+    });
+
     it('transforms attribute names using their alias', function(done) {
       var Resource = mio.Resource.extend({
         attributes: {
