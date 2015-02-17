@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "async": "^0.9.0",
-    "mio": "^1.1.2",
+    "mio": "^1.1.3",
     "mongodb": "^1.4.30"
   },
   "devDependencies": {
