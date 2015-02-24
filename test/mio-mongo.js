@@ -1697,7 +1697,14 @@ describe('MongoDB', function() {
         if (err) return done(err);
         expect(this).to.be.instanceOf(Resource);
         expect(this).to.have.property('active', true);
-        done();
+
+        Resource.post({
+          active: true,
+          author: false,
+          invalid: true
+        }, function (err) {
+          done(err);
+        });
       });
     });
   });
