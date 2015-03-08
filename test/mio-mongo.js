@@ -1206,7 +1206,102 @@ describe('MongoDB', function() {
       });
     });
 
-    it('includes related collection', function (done) {
+    it('includes related collection using belongsTo', function (done) {
+      var Foo = mio.Resource.extend({
+        attributes: {
+          id: {
+            primary: true,
+            objectId: true
+          },
+          barId: {
+            objectId: true
+          }
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function(query, options) {
+            return {
+              limit: function () {},
+              toArray: function (cb) {
+                cb(null, [{
+                  id: '547dfc2bdc1e430000ff13b0',
+                  barId: '647dfc2bdc1e430000ff13c1'
+                }, {
+                  id: '54f9f6e158e90bc703fd7215',
+                  barId: '647dfc2bdc1e430000ff13c1'
+                }, {
+                  id: '54f9f6e258e90bc703fd7216',
+                  barId: '647dfc2bdc1e430000ff13c1'
+                }, {
+                  id: '54f9f6e258e90bc703fd7217',
+                  barId: '54f9f6e158e90bc703fd7214'
+                }, {
+                  id: '54f9f6e258e90bc703fd7218'
+                }]);
+              }
+            }
+          }
+        })]
+      });
+
+      var Bar = mio.Resource.extend({
+        attributes: {
+          id: {
+            primary: true,
+            objectId: true
+          }
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function(query, options) {
+            return {
+              limit: function () {},
+              toArray: function (cb) {
+                cb(null, [{
+                  id: '647dfc2bdc1e430000ff13c1'
+                }, {
+                  id: '54f9f6e158e90bc703fd7214'
+                }]);
+              }
+            }
+          }
+        })]
+      });
+
+      Foo.belongsTo('bar', {
+        target: Bar,
+        foreignKey: 'barId'
+      });
+
+      Foo.Collection.get().withRelated('bar').exec(function (err, foos) {
+        if (err) return done(err);
+
+        expect(foos).to.be.an('object');
+        expect(foos).to.be.instanceOf(Foo.Collection);
+        expect(foos).to.have.property('length', 5);
+
+        foos.slice(0, 3).forEach(function (foo) {
+          expect(foo).to.be.an('object');
+          expect(foo).to.be.an.instanceOf(Foo);
+          expect(foo).to.have.property('bar');
+          expect(foo.bar).to.be.an('object');
+          expect(foo.bar).to.be.an.instanceOf(Bar);
+          expect(foo.bar).to.have.property('id', '647dfc2bdc1e430000ff13c1');
+        });
+
+        expect(foos.at(3)).to.be.an('object');
+        expect(foos.at(3)).to.have.property('bar');
+        expect(foos.at(3).bar).to.be.an('object');
+        expect(foos.at(3).bar).to.be.an.instanceOf(Bar);
+        expect(foos.at(3).bar).to.have.property('id', '54f9f6e158e90bc703fd7214');
+
+        expect(foos.at(4)).to.have.property('bar', null);
+
+        done();
+      });
+    });
+
+    it('includes related collection using hasMany', function (done) {
       var Book = mio.Resource.extend({
         attributes: {
           id: { primary: true },
@@ -1227,6 +1322,12 @@ describe('MongoDB', function() {
                 expect(query).to.have.property('author_id');
                 cb(null, [{
                   id: '547dfc2bdc1e430000ff13b0',
+                  author_id: '647dfc2bdc1e430000ff13c2'
+                }, {
+                  id: '547dfc2bdc1e430000ff13b1',
+                  author_id: '647dfc2bdc1e430000ff13c2'
+                }, {
+                  id: '547dfc2bdc1e430000ff13b2',
                   author_id: '647dfc2bdc1e430000ff13c1'
                 }]);
               }
@@ -1245,7 +1346,11 @@ describe('MongoDB', function() {
             return {
               limit: function () {},
               toArray: function (cb) {
-                cb(null, [{ id: '647dfc2bdc1e430000ff13c1' }]);
+                cb(null, [
+                  { id: '647dfc2bdc1e430000ff13c1' },
+                  { id: '647dfc2bdc1e430000ff13c2' },
+                  { id: '647dfc2bdc1e430000ff13c1' }
+                ]);
               }
             };
           }
@@ -1265,17 +1370,29 @@ describe('MongoDB', function() {
       Author.Collection.get().withRelated('books', 'book').exec(function (err, authors) {
         if (err) return done(err);
 
-        expect(authors).to.not.be.empty();
+        expect(authors).to.be.an('object');
+        expect(authors).to.be.instanceOf(Author.Collection);
 
-        var author = authors.at(0);
+        authors.forEach(function (author, i) {
+          expect(author).to.be.an('object');
+          expect(author).to.be.instanceOf(Author);
+          expect(author).to.have.property('books');
+          expect(author.books).to.be.an('object');
+          expect(author.books).to.be.instanceOf(Book.Collection);
 
-        expect(author).to.be.an('object');
-        expect(author).to.have.property('books');
-        expect(author.books).to.not.be.empty();
+          switch (i) {
+            case 0:
+            case 2:
+              expect(author.books.at(0)).to.have.property('id', '547dfc2bdc1e430000ff13b2');
+              break;
+            case 1:
+              expect(author.books.at(0)).to.have.property('id', '547dfc2bdc1e430000ff13b0');
+          }
 
-        expect(author).to.have.property('book');
-        expect(author.book).to.be.an('object');
-        expect(author.book).to.not.be.empty();
+          expect(author).to.have.property('book');
+          expect(author.book).to.be.an('object');
+          expect(author.book).to.not.be.empty();
+        });
 
         done();
       });
