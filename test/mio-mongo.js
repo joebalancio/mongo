@@ -1104,6 +1104,147 @@ describe('MongoDB', function() {
         });
     });
 
+    it('includes nested relations for related resources', function (done) {
+      var Request = mio.Resource.extend({
+        attributes: {
+          id: { primary: true }
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function (query, options) {
+            return {
+              limit: function () {},
+              toArray: function (cb) {
+                cb(null, [{
+                  id: '552ec9c4a3e23c130506809c'
+                }, {
+                  id: '552ec9d7a3e23c130506809d'
+                }]);
+              }
+            };
+          }
+        })]
+      });
+
+      var Invite = mio.Resource.extend({
+        attributes: {
+          id: { primary: true },
+          requestId: {},
+          recipientId: {},
+          createdBy: {}
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function (query, options) {
+            return {
+              limit: function () {},
+              toArray: function (cb) {
+                cb(null, [{
+                  id: '552ecaa26dfe373a05bc3a63',
+                  requestId: '552ec9c4a3e23c130506809c',
+                  recipientId: '552ece816dfe373a05bc3a66',
+                  createdBy: '552ed2fb6dfe373a05bc3a69'
+                }, {
+                  id: '552ecd526dfe373a05bc3a64',
+                  requestId: '552ec9c4a3e23c130506809c',
+                  recipientId: '552ed27d6dfe373a05bc3a67',
+                  createdBy: '552ed2fb6dfe373a05bc3a69'
+                }, {
+                  id: '552ecdcb6dfe373a05bc3a65',
+                  requestId: '552ec9d7a3e23c130506809d',
+                  recipientId: '552ed2a46dfe373a05bc3a68',
+                  createdBy: '552ed2fb6dfe373a05bc3a69'
+                }]);
+              }
+            };
+          }
+        })]
+      });
+
+      var User = mio.Resource.extend({
+        attributes: {
+          id: { primary: true }
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function (query, options) {
+            return {
+              limit: function () {},
+              toArray: function (cb) {
+                cb(null, [{
+                  id: '552ece816dfe373a05bc3a66'
+                }, {
+                  id: '552ed27d6dfe373a05bc3a67'
+                }, {
+                  id: '552ed2a46dfe373a05bc3a68'
+                }, {
+                  id: '552ed2fb6dfe373a05bc3a69'
+                }]);
+              }
+            };
+          }
+        })]
+      });
+
+      Request.hasMany('invites', {
+        target: Invite,
+        foreignKey: 'requestId'
+      });
+
+      Invite.belongsTo('recipient', {
+        target: User,
+        foreignKey: 'recipientId'
+      });
+
+      Invite.belongsTo('creator', {
+        target: User,
+        foreignKey: 'createdBy'
+      });
+
+      Request.Collection.get().withRelated({
+        invites: {
+          nested: true
+        }
+      }).exec(function (err, requests) {
+        if (err) return done(err);
+
+        expect(requests).to.be.instanceOf(Request.Collection);
+        expect(requests).to.have.property('length', 2);
+
+        var request0 = requests.at(0);
+        var request1 = requests.at(1);
+
+        expect(request0).to.have.property('invites');
+        expect(request0.invites).to.be.instanceOf(Invite.Collection);
+        expect(request1).to.have.property('invites');
+        expect(request1.invites).to.be.instanceOf(Invite.Collection);
+
+        var invite0 = request0.invites.at(0);
+        var invite1 = request0.invites.at(1);
+        var invite2 = request1.invites.at(0);
+
+        expect(invite0).to.have.property('recipient');
+        expect(invite0).to.have.property('creator');
+        expect(invite0.recipient).to.be.an('object');
+        expect(invite0.creator).to.be.an('object');
+        expect(invite0.creator).to.have.property('id', '552ed2fb6dfe373a05bc3a69');
+
+        expect(invite1).to.have.property('recipient');
+        expect(invite1).to.have.property('creator');
+        expect(invite1.recipient).to.be.an('object');
+        expect(invite1.creator).to.be.an('object');
+        expect(invite1.creator).to.have.property('id', '552ed2fb6dfe373a05bc3a69');
+
+        expect(invite2).to.have.property('recipient');
+        expect(invite2).to.have.property('creator');
+        expect(invite2.recipient).to.be.an('object');
+        expect(invite2.creator).to.be.an('object');
+        expect(invite2.creator).to.have.property('id', '552ed2fb6dfe373a05bc3a69');
+
+        done();
+      });
+    });
+
     it('includes related resource', function (done) {
       var Book = mio.Resource.extend({
         attributes: {
