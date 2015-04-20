@@ -1163,7 +1163,8 @@ describe('MongoDB', function() {
 
       var User = mio.Resource.extend({
         attributes: {
-          id: { primary: true }
+          id: { primary: true },
+          inviteId: {}
         }
       }, {
         use: [new MongoDbStub({
@@ -1172,13 +1173,16 @@ describe('MongoDB', function() {
               limit: function () {},
               toArray: function (cb) {
                 cb(null, [{
-                  id: '552ece816dfe373a05bc3a66'
+                  id: '552ece816dfe373a05bc3a66',
+                  inviteId: '552ecaa26dfe373a05bc3a63'
                 }, {
                   id: '552ed27d6dfe373a05bc3a67'
                 }, {
-                  id: '552ed2a46dfe373a05bc3a68'
+                  id: '552ed2a46dfe373a05bc3a68',
+                  inviteId: '552ecd526dfe373a05bc3a64'
                 }, {
-                  id: '552ed2fb6dfe373a05bc3a69'
+                  id: '552ed2fb6dfe373a05bc3a69',
+                  inviteId: '552ecdcb6dfe373a05bc3a65'
                 }]);
               }
             };
@@ -1189,6 +1193,11 @@ describe('MongoDB', function() {
       Request.hasMany('invites', {
         target: Invite,
         foreignKey: 'requestId'
+      });
+
+      Invite.hasOne('editor', {
+        target: User,
+        foreignKey: 'inviteId'
       });
 
       Invite.belongsTo('recipient', {
@@ -1225,21 +1234,30 @@ describe('MongoDB', function() {
 
         expect(invite0).to.have.property('recipient');
         expect(invite0).to.have.property('creator');
+        expect(invite0).to.have.property('editor');
         expect(invite0.recipient).to.be.an('object');
         expect(invite0.creator).to.be.an('object');
         expect(invite0.creator).to.have.property('id', '552ed2fb6dfe373a05bc3a69');
+        expect(invite0.editor).to.be.an('object');
+        expect(invite0.editor).to.have.property('id', '552ece816dfe373a05bc3a66');
 
         expect(invite1).to.have.property('recipient');
         expect(invite1).to.have.property('creator');
+        expect(invite1).to.have.property('editor');
         expect(invite1.recipient).to.be.an('object');
         expect(invite1.creator).to.be.an('object');
         expect(invite1.creator).to.have.property('id', '552ed2fb6dfe373a05bc3a69');
+        expect(invite1.editor).to.be.an('object');
+        expect(invite1.editor).to.have.property('id', '552ed2a46dfe373a05bc3a68');
 
         expect(invite2).to.have.property('recipient');
         expect(invite2).to.have.property('creator');
+        expect(invite2).to.have.property('editor');
         expect(invite2.recipient).to.be.an('object');
         expect(invite2.creator).to.be.an('object');
         expect(invite2.creator).to.have.property('id', '552ed2fb6dfe373a05bc3a69');
+        expect(invite2.editor).to.be.an('object');
+        expect(invite2.editor).to.have.property('id', '552ed2fb6dfe373a05bc3a69');
 
         done();
       });
