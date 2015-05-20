@@ -395,6 +395,88 @@ describe('MongoDB', function() {
       });
     });
 
+    it('does not include related resource if related key is null', function (done) {
+      var Book = mio.Resource.extend({
+        attributes: {
+          id: { primary: true },
+          editor_id: {},
+          author_id: {}
+        }
+      }, {
+        use: [new MongoDbStub({
+          findOne: function (query, options, cb) {
+            cb(null, {
+              id: '547dfc2bdc1e430000ff13b0',
+              author_id: null,
+              editor_id: '647dfc2bdc1e430000ff13c1'
+            });
+          }
+        })]
+      });
+
+      var Author = mio.Resource.extend({
+        attributes: {
+          id: { primary: true }
+        }
+      }, {
+        use: [new MongoDbStub({
+          findOne: function (query, options, cb) {
+            cb(null, { id: '647dfc2bdc1e430000ff13c1' });
+          }
+        })]
+      });
+
+      var Certification = mio.Resource.extend({
+        attributes: {
+          id: { primary: true },
+          book_id: {}
+        }
+      }, {
+        use: [new MongoDbStub({
+          findOne: function (query, options, cb) {
+            cb(null, {
+              id: '848dfc2bdc1e430000ff13j2',
+              book_id: '547dfc2bdc1e430000ff13b0'
+            });
+          }
+        })]
+      });
+
+      Book.belongsTo('author', {
+        target: Author,
+        foreignKey: 'author_id'
+      });
+
+      Book.belongsTo('editor', {
+        target: Author,
+        foreignKey: 'editor_id'
+      });
+
+      Book.hasOne('certification', {
+        target: Certification,
+        foreignKey: 'book_id'
+      });
+
+      Book.get(1).withRelated('author', 'editor', 'certification').exec(function (err, book) {
+        if (err) return done(err);
+
+        expect(book).to.not.be.empty();
+
+        expect(book).to.have.property('author');
+        expect(book.author).to.be.null();
+
+        expect(book).to.have.property('editor');
+        expect(book.editor).to.be.an('object');
+        expect(book.editor).to.not.be.empty();
+
+        expect(book).to.have.property('certification');
+        expect(book.certification).to.be.an('object');
+        expect(book.certification).to.not.be.empty();
+
+        done();
+      });
+    });
+
     it('filters by relation', function (done) {
       var Book = mio.Resource.extend({
         attributes: {
