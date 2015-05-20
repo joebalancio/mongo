@@ -384,7 +384,7 @@ describe('MongoDB', function() {
         expect(book.author).to.not.be.empty();
 
         expect(book).to.have.property('editor');
-        expect(book.author).to.be.an('object');
+        expect(book.editor).to.be.an('object');
         expect(book.editor).to.not.be.empty();
 
         expect(book).to.have.property('certification');
