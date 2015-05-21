@@ -1819,6 +1819,7 @@ describe('MongoDB', function() {
           name: { required: true }
         }
       }, {
+        maxPageSize: 100,
         use: [new MongoDbStub({
           find: function(query, options) {
             expect(options).to.be.an('object');
@@ -1853,6 +1854,7 @@ describe('MongoDB', function() {
           authorId: { required: true }
         }
       }, {
+        maxPageSize: 100,
         use: [new MongoDbStub({
           find: function(query, options) {
             expect(options).to.be.an('object');
