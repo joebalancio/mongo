@@ -124,7 +124,7 @@ describe('MongoDB', function() {
       }
     }, {
       use: [new MongoDbStub({
-        findOne: function (query, options, cb) {
+        findOne: function (query, select, options, cb) {
           cb(null, {
             _id: new ObjectID('547dfc2bdc1e430000ff13b0'),
             authorId: new ObjectID('647dfc2bdc1e430000ff13c1'),
@@ -172,7 +172,7 @@ describe('MongoDB', function() {
             review_id: new ObjectID('147dfc2bdc1e430000ff13b5')
           }]);
         },
-        findOne: function (query, options, cb) {
+        findOne: function (query, select, options, cb) {
           cb(null, {
             _id: new ObjectID('547dfc2bdc1e430000ff13b0'),
             authorId: new ObjectID('647dfc2bdc1e430000ff13c1'),
@@ -215,7 +215,7 @@ describe('MongoDB', function() {
       }
     }, {
       use: [new MongoDbStub({
-        findOne: function (query, options, cb) {
+        findOne: function (query, select, options, cb) {
           cb(null, {
             _id: new ObjectID('547dfc2bdc1e430000ff13b0'),
             authorId: null,
@@ -254,7 +254,7 @@ describe('MongoDB', function() {
         }
       }, {
         use: [new MongoDbStub({
-          findOne: function (query, options, cb) {
+          findOne: function (query, select, options, cb) {
             expect(query).to.have.property('createdAt');
             expect(query.createdAt).to.be.instanceOf(Date);
             expect(query).to.have.property('updatedAt');
@@ -299,7 +299,7 @@ describe('MongoDB', function() {
         }
       }, {
         use: [new MongoDbStub({
-          findOne: function (query, options, cb) {
+          findOne: function (query, select, options, cb) {
             cb(null, { _id: '547dfc2bdc1e430000ff13b0' });
           }
         })]
@@ -321,7 +321,7 @@ describe('MongoDB', function() {
         }
       }, {
         use: [new MongoDbStub({
-          findOne: function (query, options, cb) {
+          findOne: function (query, select, options, cb) {
             cb(null, {
               id: '547dfc2bdc1e430000ff13b0',
               author_id: '647dfc2bdc1e430000ff13c1',
@@ -337,7 +337,7 @@ describe('MongoDB', function() {
         }
       }, {
         use: [new MongoDbStub({
-          findOne: function (query, options, cb) {
+          findOne: function (query, select, options, cb) {
             cb(null, { id: '647dfc2bdc1e430000ff13c1' });
           }
         })]
@@ -350,7 +350,7 @@ describe('MongoDB', function() {
         }
       }, {
         use: [new MongoDbStub({
-          findOne: function (query, options, cb) {
+          findOne: function (query, select, options, cb) {
             cb(null, {
               id: '848dfc2bdc1e430000ff13j2',
               book_id: '547dfc2bdc1e430000ff13b0'
@@ -404,7 +404,7 @@ describe('MongoDB', function() {
         }
       }, {
         use: [new MongoDbStub({
-          findOne: function (query, options, cb) {
+          findOne: function (query, select, options, cb) {
             cb(null, {
               id: '547dfc2bdc1e430000ff13b0',
               author_id: null,
@@ -420,7 +420,7 @@ describe('MongoDB', function() {
         }
       }, {
         use: [new MongoDbStub({
-          findOne: function (query, options, cb) {
+          findOne: function (query, select, options, cb) {
             cb(null, { id: '647dfc2bdc1e430000ff13c1' });
           }
         })]
@@ -433,7 +433,7 @@ describe('MongoDB', function() {
         }
       }, {
         use: [new MongoDbStub({
-          findOne: function (query, options, cb) {
+          findOne: function (query, select, options, cb) {
             cb(null, {
               id: '848dfc2bdc1e430000ff13j2',
               book_id: '547dfc2bdc1e430000ff13b0'
@@ -496,7 +496,7 @@ describe('MongoDB', function() {
               }
             }
           },
-          findOne: function(query, options, cb) {
+          findOne: function(query, select, options, cb) {
             cb(null, {
               id: "647dfc2bdc1e430000ff13c1",
               name: "test"
@@ -586,7 +586,7 @@ describe('MongoDB', function() {
         }
       }, {
         use: [new MongoDbStub({
-          findOne: function(query, options, cb) {
+          findOne: function(query, select, options, cb) {
             cb(null, {
               id: '547dfc2bdc1e430000ff13b0',
               author_id: '647dfc2bdc1e430000ff13c1'
@@ -613,7 +613,7 @@ describe('MongoDB', function() {
         }
       }, {
         use: [new MongoDbStub({
-          findOne: function(query, options, cb) {
+          findOne: function(query, select, options, cb) {
             cb(null, { id: '647dfc2bdc1e430000ff13c1' });
           }
         })]
@@ -664,7 +664,7 @@ describe('MongoDB', function() {
               }
             }
           },
-          findOne: function(query, options, cb) {
+          findOne: function(query, select, options, cb) {
             cb(null, {
               id: "647dfc2bdc1e430000ff13c1",
               name: "test"
@@ -823,7 +823,7 @@ describe('MongoDB', function() {
         }
       }, {
         use: [new MongoDbStub({
-          findOne: function (query, options, cb) {
+          findOne: function (query, select, options, cb) {
             cb(null, {
               id: '547dfc2bdc1e430000ff13b0',
               author_id: '647dfc2bdc1e430000ff13c1',
@@ -839,7 +839,7 @@ describe('MongoDB', function() {
         }
       }, {
         use: [new MongoDbStub({
-          findOne: function (query, options, cb) {
+          findOne: function (query, select, options, cb) {
             cb(null, { id: '647dfc2bdc1e430000ff13c1' });
           }
         })]
@@ -943,7 +943,7 @@ describe('MongoDB', function() {
           db: {
             collection: function(name) {
               return {
-                find: function(query, options) {
+                find: function(query, select, options) {
                   expect(options).to.be.an('object');
                   expect(options).to.have.property('sort');
                   expect(options.sort).to.be.an('object');
@@ -1042,7 +1042,7 @@ describe('MongoDB', function() {
               }
             }
           },
-          findOne: function(query, options, cb) {
+          findOne: function(query, select, options, cb) {
             cb(null, {
               id: "647dfc2bdc1e430000ff13c1",
               name: "test"
@@ -1186,7 +1186,7 @@ describe('MongoDB', function() {
         });
     });
 
-    it('includes nested relations for related resources', function (done) {
+    it('does not pass default to paginating relations', function (done) {
       var Request = mio.Resource.extend({
         attributes: {
           id: { primary: true }
@@ -1199,6 +1199,10 @@ describe('MongoDB', function() {
               toArray: function (cb) {
                 cb(null, [{
                   id: '552ec9c4a3e23c130506809c'
+                }, {
+                  id: '552ec9c4a3e23c130506809b'
+                }, {
+                  id: '552ec9c4a3e23c130506809e'
                 }, {
                   id: '552ec9d7a3e23c130506809d'
                 }]);
@@ -1216,25 +1220,52 @@ describe('MongoDB', function() {
           createdBy: {}
         }
       }, {
+        defaultPageSize: 1,
         use: [new MongoDbStub({
           find: function (query, options) {
+            expect(options).to.not.have.property('limit');
             return {
               limit: function () {},
               toArray: function (cb) {
                 cb(null, [{
-                  id: '552ecaa26dfe373a05bc3a63',
+                  id: '552ecaa26dfe373a05bc3a66',
                   requestId: '552ec9c4a3e23c130506809c',
-                  recipientId: '552ece816dfe373a05bc3a66',
+                  recipientId: '552ed27d6dfe373a05bc3a61',
                   createdBy: '552ed2fb6dfe373a05bc3a69'
                 }, {
-                  id: '552ecd526dfe373a05bc3a64',
+                  id: '552ecaa26dfe373a05bc3a67',
+                  requestId: '552ec9c4a3e23c130506809b',
+                  recipientId: '552ed27d6dfe373a05bc3a62',
+                  createdBy: '552ed2fb6dfe373a05bc3a69'
+                }, {
+                  id: '552ecaa26dfe373a05bc3a68',
+                  requestId: '552ec9c4a3e23c130506809e',
+                  recipientId: '552ed27d6dfe373a05bc3a63',
+                  createdBy: '552ed2fb6dfe373a05bc3a69'
+                }, {
+                  id: '552ecaa26dfe373a05bc3a69',
+                  requestId: '552ec9d7a3e23c130506809d',
+                  recipientId: '552ed27d6dfe373a05bc3a64',
+                  createdBy: '552ed2fb6dfe373a05bc3a69'
+                }, {
+                  id: '552ecaa26dfe373a05bc3a70',
                   requestId: '552ec9c4a3e23c130506809c',
+                  recipientId: '552ed27d6dfe373a05bc3a65',
+                  createdBy: '552ed2fb6dfe373a05bc3a69'
+                }, {
+                  id: '552ecaa26dfe373a05bc3a71',
+                  requestId: '552ec9c4a3e23c130506809c',
+                  recipientId: '552ed27d6dfe373a05bc3a66',
+                  createdBy: '552ed2fb6dfe373a05bc3a69'
+                }, {
+                  id: '552ecaa26dfe373a05bc3a72',
+                  requestId: '552ec9c4a3e23c130506809e',
                   recipientId: '552ed27d6dfe373a05bc3a67',
                   createdBy: '552ed2fb6dfe373a05bc3a69'
                 }, {
-                  id: '552ecdcb6dfe373a05bc3a65',
+                  id: '552ecaa26dfe373a05bc3a73',
                   requestId: '552ec9d7a3e23c130506809d',
-                  recipientId: '552ed2a46dfe373a05bc3a68',
+                  recipientId: '552ed27d6dfe373a05bc3a68',
                   createdBy: '552ed2fb6dfe373a05bc3a69'
                 }]);
               }
@@ -1245,26 +1276,36 @@ describe('MongoDB', function() {
 
       var User = mio.Resource.extend({
         attributes: {
-          id: { primary: true },
-          inviteId: {}
+          id: { primary: true }
         }
       }, {
+        defaultPageSize: 2,
         use: [new MongoDbStub({
           find: function (query, options) {
+            expect(options).to.not.have.property('limit');
             return {
               limit: function () {},
               toArray: function (cb) {
                 cb(null, [{
-                  id: '552ece816dfe373a05bc3a66',
-                  inviteId: '552ecaa26dfe373a05bc3a63'
+                  id: '552ed27d6dfe373a05bc3a61'
+                }, {
+                  id: '552ed27d6dfe373a05bc3a62'
+                }, {
+                  id: '552ed27d6dfe373a05bc3a63'
+                }, {
+                  id: '552ed27d6dfe373a05bc3a64'
+                }, {
+                  id: '552ed27d6dfe373a05bc3a65'
+                }, {
+                  id: '552ed27d6dfe373a05bc3a66'
+                }, {
+                  id: '552ed27d6dfe373a05bc3a70'
+                }, {
+                  id: '552ed27d6dfe373a05bc3a68'
+                }, {
+                  id: '552ed2fb6dfe373a05bc3a69'
                 }, {
                   id: '552ed27d6dfe373a05bc3a67'
-                }, {
-                  id: '552ed2a46dfe373a05bc3a68',
-                  inviteId: '552ecd526dfe373a05bc3a64'
-                }, {
-                  id: '552ed2fb6dfe373a05bc3a69',
-                  inviteId: '552ecdcb6dfe373a05bc3a65'
                 }]);
               }
             };
@@ -1277,11 +1318,6 @@ describe('MongoDB', function() {
         foreignKey: 'requestId'
       });
 
-      Invite.hasOne('editor', {
-        target: User,
-        foreignKey: 'inviteId'
-      });
-
       Invite.belongsTo('recipient', {
         target: User,
         foreignKey: 'recipientId'
@@ -1292,57 +1328,11 @@ describe('MongoDB', function() {
         foreignKey: 'createdBy'
       });
 
-      Request.Collection.get().withRelated({
+      Request.Collection.get().size(4).withRelated({
         invites: {
           nested: true
         }
-      }).exec(function (err, requests) {
-        if (err) return done(err);
-
-        expect(requests).to.be.instanceOf(Request.Collection);
-        expect(requests).to.have.property('length', 2);
-
-        var request0 = requests.at(0);
-        var request1 = requests.at(1);
-
-        expect(request0).to.have.property('invites');
-        expect(request0.invites).to.be.instanceOf(Invite.Collection);
-        expect(request1).to.have.property('invites');
-        expect(request1.invites).to.be.instanceOf(Invite.Collection);
-
-        var invite0 = request0.invites.at(0);
-        var invite1 = request0.invites.at(1);
-        var invite2 = request1.invites.at(0);
-
-        expect(invite0).to.have.property('recipient');
-        expect(invite0).to.have.property('creator');
-        expect(invite0).to.have.property('editor');
-        expect(invite0.recipient).to.be.an('object');
-        expect(invite0.creator).to.be.an('object');
-        expect(invite0.creator).to.have.property('id', '552ed2fb6dfe373a05bc3a69');
-        expect(invite0.editor).to.be.an('object');
-        expect(invite0.editor).to.have.property('id', '552ece816dfe373a05bc3a66');
-
-        expect(invite1).to.have.property('recipient');
-        expect(invite1).to.have.property('creator');
-        expect(invite1).to.have.property('editor');
-        expect(invite1.recipient).to.be.an('object');
-        expect(invite1.creator).to.be.an('object');
-        expect(invite1.creator).to.have.property('id', '552ed2fb6dfe373a05bc3a69');
-        expect(invite1.editor).to.be.an('object');
-        expect(invite1.editor).to.have.property('id', '552ed2a46dfe373a05bc3a68');
-
-        expect(invite2).to.have.property('recipient');
-        expect(invite2).to.have.property('creator');
-        expect(invite2).to.have.property('editor');
-        expect(invite2.recipient).to.be.an('object');
-        expect(invite2.creator).to.be.an('object');
-        expect(invite2.creator).to.have.property('id', '552ed2fb6dfe373a05bc3a69');
-        expect(invite2.editor).to.be.an('object');
-        expect(invite2.editor).to.have.property('id', '552ed2fb6dfe373a05bc3a69');
-
-        done();
-      });
+      }).exec(done);
     });
 
     it('includes related resource', function (done) {
@@ -1550,7 +1540,7 @@ describe('MongoDB', function() {
         }
       }, {
         use: [new MongoDbStub({
-          findOne: function(query, options, cb) {
+          findOne: function(query, select, options, cb) {
             cb(null, {
               id: '547dfc2bdc1e430000ff13b0',
               author_id: '647dfc2bdc1e430000ff13c1'
@@ -1658,7 +1648,7 @@ describe('MongoDB', function() {
               }
             }
           },
-          findOne: function(query, options, cb) {
+          findOne: function(query, select, options, cb) {
             cb(null, {
               id: "647dfc2bdc1e430000ff13c1",
               name: "test"
@@ -1812,6 +1802,165 @@ describe('MongoDB', function() {
       });
     });
 
+    it('includes nested relations for related resources', function (done) {
+      var Request = mio.Resource.extend({
+        attributes: {
+          id: { primary: true }
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function (query, options) {
+            return {
+              limit: function () {},
+              toArray: function (cb) {
+                cb(null, [{
+                  id: '552ec9c4a3e23c130506809c'
+                }, {
+                  id: '552ec9d7a3e23c130506809d'
+                }]);
+              }
+            };
+          }
+        })]
+      });
+
+      var Invite = mio.Resource.extend({
+        attributes: {
+          id: { primary: true },
+          requestId: {},
+          recipientId: {},
+          createdBy: {}
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function (query, options) {
+            return {
+              limit: function () {},
+              toArray: function (cb) {
+                cb(null, [{
+                  id: '552ecaa26dfe373a05bc3a63',
+                  requestId: '552ec9c4a3e23c130506809c',
+                  recipientId: '552ece816dfe373a05bc3a66',
+                  createdBy: '552ed2fb6dfe373a05bc3a69'
+                }, {
+                  id: '552ecd526dfe373a05bc3a64',
+                  requestId: '552ec9c4a3e23c130506809c',
+                  recipientId: '552ed27d6dfe373a05bc3a67',
+                  createdBy: '552ed2fb6dfe373a05bc3a69'
+                }, {
+                  id: '552ecdcb6dfe373a05bc3a65',
+                  requestId: '552ec9d7a3e23c130506809d',
+                  recipientId: '552ed2a46dfe373a05bc3a68',
+                  createdBy: '552ed2fb6dfe373a05bc3a69'
+                }]);
+              }
+            };
+          }
+        })]
+      });
+
+      var User = mio.Resource.extend({
+        attributes: {
+          id: { primary: true },
+          inviteId: {}
+        }
+      }, {
+        use: [new MongoDbStub({
+          find: function (query, options) {
+            return {
+              limit: function () {},
+              toArray: function (cb) {
+                cb(null, [{
+                  id: '552ece816dfe373a05bc3a66',
+                  inviteId: '552ecaa26dfe373a05bc3a63'
+                }, {
+                  id: '552ed27d6dfe373a05bc3a67'
+                }, {
+                  id: '552ed2a46dfe373a05bc3a68',
+                  inviteId: '552ecd526dfe373a05bc3a64'
+                }, {
+                  id: '552ed2fb6dfe373a05bc3a69',
+                  inviteId: '552ecdcb6dfe373a05bc3a65'
+                }]);
+              }
+            };
+          }
+        })]
+      });
+
+      Request.hasMany('invites', {
+        target: Invite,
+        foreignKey: 'requestId'
+      });
+
+      Invite.hasOne('editor', {
+        target: User,
+        foreignKey: 'inviteId'
+      });
+
+      Invite.belongsTo('recipient', {
+        target: User,
+        foreignKey: 'recipientId'
+      });
+
+      Invite.belongsTo('creator', {
+        target: User,
+        foreignKey: 'createdBy'
+      });
+
+      Request.Collection.get().withRelated({
+        invites: {
+          nested: true
+        }
+      }).exec(function (err, requests) {
+        if (err) return done(err);
+
+        expect(requests).to.be.instanceOf(Request.Collection);
+        expect(requests).to.have.property('length', 2);
+
+        var request0 = requests.at(0);
+        var request1 = requests.at(1);
+
+        expect(request0).to.have.property('invites');
+        expect(request0.invites).to.be.instanceOf(Invite.Collection);
+        expect(request1).to.have.property('invites');
+        expect(request1.invites).to.be.instanceOf(Invite.Collection);
+
+        var invite0 = request0.invites.at(0);
+        var invite1 = request0.invites.at(1);
+        var invite2 = request1.invites.at(0);
+
+        expect(invite0).to.have.property('recipient');
+        expect(invite0).to.have.property('creator');
+        expect(invite0).to.have.property('editor');
+        expect(invite0.recipient).to.be.an('object');
+        expect(invite0.creator).to.be.an('object');
+        expect(invite0.creator).to.have.property('id', '552ed2fb6dfe373a05bc3a69');
+        expect(invite0.editor).to.be.an('object');
+        expect(invite0.editor).to.have.property('id', '552ece816dfe373a05bc3a66');
+
+        expect(invite1).to.have.property('recipient');
+        expect(invite1).to.have.property('creator');
+        expect(invite1).to.have.property('editor');
+        expect(invite1.recipient).to.be.an('object');
+        expect(invite1.creator).to.be.an('object');
+        expect(invite1.creator).to.have.property('id', '552ed2fb6dfe373a05bc3a69');
+        expect(invite1.editor).to.be.an('object');
+        expect(invite1.editor).to.have.property('id', '552ed2a46dfe373a05bc3a68');
+
+        expect(invite2).to.have.property('recipient');
+        expect(invite2).to.have.property('creator');
+        expect(invite2).to.have.property('editor');
+        expect(invite2.recipient).to.be.an('object');
+        expect(invite2.creator).to.be.an('object');
+        expect(invite2.creator).to.have.property('id', '552ed2fb6dfe373a05bc3a69');
+        expect(invite2.editor).to.be.an('object');
+        expect(invite2.editor).to.have.property('id', '552ed2fb6dfe373a05bc3a69');
+
+        done();
+      });
+    });
+
     it('passes query pagination parameters to mongo', function (done) {
       var Book = mio.Resource.extend({
         attributes: {
@@ -1821,7 +1970,7 @@ describe('MongoDB', function() {
       }, {
         maxPageSize: 100,
         use: [new MongoDbStub({
-          find: function(query, options) {
+          find: function(query, select, options) {
             expect(options).to.be.an('object');
             expect(options).to.have.property('skip', 6);
             expect(options).to.have.property('limit', 100);
@@ -1856,7 +2005,7 @@ describe('MongoDB', function() {
       }, {
         maxPageSize: 100,
         use: [new MongoDbStub({
-          find: function(query, options) {
+          find: function(query, select, options) {
             expect(options).to.be.an('object');
             expect(options).to.have.property('skip', 6);
             expect(options).to.have.property('limit', 100);
@@ -1938,7 +2087,7 @@ describe('MongoDB', function() {
         expect(book.reviews).to.be.an.instanceOf(Review.Collection);
         expect(book.reviews).to.have.property('from', 10);
         expect(book.reviews).to.have.property('size', 70);
-        expect(book.reviews).to.have.property('length', 70);
+        expect(book.reviews).to.have.property('length', 60);
 
         done();
       });
@@ -2037,7 +2186,7 @@ describe('MongoDB', function() {
         }
       }, {
         use: [new MongoDbStub({
-          findOne: function (query, options, cb) {
+          findOne: function (query, select, options, cb) {
             cb(null, { id: '647dfc2bdc1e430000ff13c1' });
           }
         })]
@@ -2153,7 +2302,7 @@ describe('MongoDB', function() {
           db: {
             collection: function(name) {
               return {
-                findOne: function(query, options, cb) {
+                findOne: function(query, select, options, cb) {
                   cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
                 },
                 findAndModify: function(query, doc, sort, options, cb) {
@@ -2224,7 +2373,7 @@ describe('MongoDB', function() {
           db: {
             collection: function(name) {
               return {
-                findOne: function(query, options, cb) {
+                findOne: function(query, select, options, cb) {
                   cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
                 },
                 findAndModify: function(query, doc, sort, options, cb) {
@@ -2260,7 +2409,7 @@ describe('MongoDB', function() {
           db: {
             collection: function(name) {
               return {
-                findOne: function(query, options, cb) {
+                findOne: function(query, select, options, cb) {
                   cb(null, { _id: "547dfc2bdc1e430000ff13b0" });
                 },
                 findAndModify: function(query, doc, sort, options, cb) {
