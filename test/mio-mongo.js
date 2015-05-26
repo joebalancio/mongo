@@ -919,6 +919,54 @@ describe('MongoDB', function() {
       });
     });
 
+    it('includes count if necessary', function (done) {
+      var Resource = mio.Resource.extend({
+        attributes: {
+          active: { default: false }
+        },
+      }, {
+        use: [MongoDB({
+          connectionString: "localhost",
+          collection: "users",
+          db: {
+            collection: function(name) {
+              return {
+                count: function (query, cb) {
+                  expect(query).to.have.property('active', true);
+                  cb(null, 3);
+                },
+                find: function(query, select, options) {
+                  var chain = {
+                    sort: function () { return chain; },
+                    skip: function () { return chain; },
+                    limit: function () { return chain; },
+                    toArray: function (cb) {
+                      cb(null, [{ active: true }]);
+                    }
+                  };
+                  return chain;
+                }
+              };
+            }
+          }
+        })]
+      });
+
+      Resource.Collection
+        .get({
+          where: {
+            active: true
+          }
+        })
+        .withCount()
+        .exec(function(err, resources) {
+          if (err) return done(err);
+          expect(resources).to.be.instanceOf(Resource.Collection);
+          expect(resources).to.have.property('total', 3);
+          done();
+        });
+    });
+
     it('transforms sort of "desc" into -1', function (done) {
       var Resource = mio.Resource.extend({
         attributes: {
@@ -1082,7 +1130,7 @@ describe('MongoDB', function() {
         }
       }, {
         use: [new MongoDbStub({
-          find: function (query, options) {
+          find: function (query, select, options) {
             return {
               limit: function () {},
               toArray: function (cb) {
