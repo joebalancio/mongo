@@ -42,7 +42,7 @@ gulp.task('instrument', function() {
 
 gulp.task('docs', function(done) {
   jsdoc2md.render('./lib/*.js', {
-    template: './lib/readme.hbs'
+    template: './lib/README_template.md.hbs'
   })
   .on('error', done)
   .on('end', done)
