@@ -2368,4 +2368,53 @@ describe('MongoDB', function() {
       Resource.Collection.delete({ active: true }, done);
     });
   });
+
+  describe('listeners', function () {
+    var Resource = mio.Resource.extend({
+      attributes: {
+        _id: { primary: true },
+        active: { default: false }
+      },
+    }, {
+      use: [MongoDB({
+        connectionString: "localhost",
+        collection: "users",
+        db: {
+          collection: function(name) {
+            return {
+              remove: function(query, options, cb) {
+                cb();
+              }
+            };
+          }
+        }
+      })]
+    });
+    describe('.set', function () {
+      it('should handle null', function () {
+        function test() {
+          var resource = new Resource();
+          resource.set(null)
+        }
+        expect(test).to.not.throw(Error);
+      })
+    })
+    describe('.reset', function () {
+      it('should handle null', function () {
+        function test() {
+          var resource = new Resource();
+          resource.reset(null)
+        }
+        expect(test).to.not.throw(Error);
+      })
+    })
+    describe('.initialize', function () {
+      it('should handle null', function () {
+        function test() {
+          var resource = new Resource(null);
+        }
+        expect(test).to.not.throw(Error);
+      })
+    })
+  });
 });
