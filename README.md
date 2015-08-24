@@ -8,11 +8,7 @@ Install using [npm](https://www.npmjs.org/):
 npm install mio-mongo
 ```
 
-## API Reference
-
-<a name="module_mio-mongo"></a>
-#mio-mongo
-#### Basic usage
+## Usage
 
 ```javascript
 var mio = require('mio');
@@ -40,6 +36,26 @@ User.Collection.get()
       // ...
     });
   });
+```
+
+#### ObjectIDs
+
+Automatically stringify and cast ObjectId's by setting `objectId: true`.
+
+```javascript
+var User = mio.Resource.extend({
+  attributes: {
+    companyId: {
+      objectId: true
+    }
+  }
+});
+
+User.find({
+  companyId: '547dfc2bdc1e430000ff13b0'
+}).exec(function (err, user) {
+  console.log(typeof user.companyId); // => "string"
+});
 ```
 
 #### Relations
@@ -85,28 +101,24 @@ var User = mio.Resource.extend({
 User.find({ name: 'Alex' }).exec(...);
 ```
 
-#### ObjectId
+#### Mongo client
 
-Automatically stringify and cast ObjectId's by setting `objectId: true`.
+Access the mongo client directly via `Resource.options.mongo.db` and the
+resource's collection via `Resource.options.mongo.dbCollection`.
 
-```javascript
-var User = mio.Resource.extend({
-  attributes: {
-    companyId: {
-      objectId: true
-    }
-  }
-});
+## API Reference
 
-User.find({
-  companyId: '547dfc2bdc1e430000ff13b0'
-}).exec(function (err, user) {
-  console.log(typeof user.companyId); // => "string"
-});
-```
+<a name="module_mio-mongo"></a>
+## mio-mongo
 
-<a name="exp_module_mio-mongo"></a>
-##module.exports(settings) ⏏
+* [mio-mongo](#module_mio-mongo)
+  * [module.exports(settings)](#exp_module_mio-mongo--module.exports) ⇒ <code>function</code> ⏏
+    * [~prepareResource(resource, attributes)](#module_mio-mongo--module.exports..prepareResource) ⇒ <code>Object</code>
+    * ["mongodb:query" (query)](#module_mio-mongo--module.exports..mongodb_query)
+    * ["mongodb:collection" (collection)](#module_mio-mongo--module.exports..mongodb_collection)
+
+<a name="exp_module_mio-mongo--module.exports"></a>
+### module.exports(settings) ⇒ <code>function</code> ⏏
 It is recommended to share the same `settings.db` object between
 different resources so they can share the same mongo client and connection
 pool.
@@ -117,45 +129,58 @@ run.
 If you'd like to use the mongo client directly, the `db` is available via
 `Resource.options.mongo.db`.
 
-**Params**
+**Kind**: Exported function  
+**Returns**: <code>function</code> - returns Mio plugin  
 
-- settings `Object`  
-  - collection `String` - mongodb collection for this resource  
-  - \[connectionString\] `String` - mongodb connection string. required
-if `settings.db` is not provided.  
-  - \[connectionOptions\] `Object` - mongodb connection options  
-  - \[db\] `mongodb.MongoClient.Db` - reuse node-mongo-native db
-connection  
+| Param | Type | Description |
+| --- | --- | --- |
+| settings | <code>Object</code> |  |
+| settings.collection | <code>String</code> | mongodb collection for this resource |
+| [settings.connectionString] | <code>String</code> | mongodb connection string. required if `settings.db` is not provided. |
+| [settings.connectionOptions] | <code>Object</code> | mongodb connection options |
+| [settings.db] | <code>mongodb.MongoClient.Db</code> | reuse node-mongo-native db connection |
 
-**Returns**: `function` - returns Mio plugin  
+<a name="module_mio-mongo--module.exports..prepareResource"></a>
+#### module.exports~prepareResource(resource, attributes) ⇒ <code>Object</code>
+Prepare resource attributes.
 
+- Translate attribute aliases
+- Stringify ObjectIDs
+- Remove undefined attributes
 
-### Events
+**Kind**: inner method of <code>[module.exports](#exp_module_mio-mongo--module.exports)</code>  
 
-<a name="module_mio-mongo..mongodb_query"></a>
-#event: "mongodb:query"
+| Param | Type |
+| --- | --- |
+| resource | <code>[Resource](#external_mio.Resource)</code> | 
+| attributes | <code>Object</code> | 
+
+<a name="module_mio-mongo--module.exports..mongodb_query"></a>
+#### "mongodb:query" (query)
 Emitted with `query` argument whenever a `query` is received and before it
 is processed, to allow for transformation.
 
-**Params**
+**Kind**: event emitted by <code>[module.exports](#exp_module_mio-mongo--module.exports)</code>  
 
-- query `Object`  
+| Param | Type |
+| --- | --- |
+| query | <code>Object</code> | 
 
-**Scope**: inner event of [mio-mongo](#module_mio-mongo)  
-
-<a name="module_mio-mongo..mongodb_collection"></a>
-#event: "mongodb:collection"
+<a name="module_mio-mongo--module.exports..mongodb_collection"></a>
+#### "mongodb:collection" (collection)
 Emitted whenever a collection of resources is returned. Collections returned
 by `mio-mongo` include `size` and `from` pagination properties.
 
-**Params**
+**Kind**: event emitted by <code>[module.exports](#exp_module_mio-mongo--module.exports)</code>  
 
-- collection <code>[external:mio.Resource.Collection](external:mio.Resource.Collection)</code>  
-  - from `Number`  
-  - size `Number`  
+| Param | Type |
+| --- | --- |
+| collection | <code>external:mio.Resource.Collection</code> | 
+| collection.from | <code>Number</code> | 
+| collection.size | <code>Number</code> | 
 
-**Scope**: inner event of [mio-mongo](#module_mio-mongo)  
 
+### Events
 
 ## Contributing
 

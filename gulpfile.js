@@ -10,19 +10,12 @@ var coveralls = require('gulp-coveralls');
 var gulp = require('gulp');
 var mocha = require('gulp-mocha');
 var instrument = require('gulp-instrument');
-var jsdoc2md = require('jsdoc-to-markdown');
+var jsdoc2md = require('gulp-jsdoc-to-markdown');
 var fs = require('fs');
 var source = require('vinyl-source-stream');
 var spawn = require('child_process').spawn;
 var clean = require('gulp-clean');
-var jshint = require('gulp-jshint');
-var stylish = require('jshint-stylish');
-
-gulp.task('jshint', function () {
-  return gulp.src(['lib/**/*.js', 'test/**/*.js'])
-    .pipe(jshint())
-    .pipe(jshint.reporter(stylish));
-});
+var rename = require('gulp-rename');
 
 gulp.task('test', function () {
   return gulp.src('test/**/*.js')
@@ -40,13 +33,16 @@ gulp.task('instrument', function() {
     .pipe(gulp.dest('lib-cov'));
 });
 
-gulp.task('docs', function(done) {
-  jsdoc2md.render('./lib/*.js', {
-    template: './lib/readme.hbs'
-  })
-  .on('error', done)
-  .on('end', done)
-  .pipe(fs.createWriteStream('README.md'))
+gulp.task('docs', function () {
+  return gulp.src('./lib/*.js')
+    .pipe(jsdoc2md({
+      template: fs.readFileSync('./lib/README_template.md.hbs', 'utf8')
+    }))
+    .pipe(rename({
+      basename: 'README',
+      extname: '.md'
+    }))
+    .pipe(gulp.dest('./'));
 });
 
 gulp.task('coverage', ['instrument'], function() {
@@ -93,8 +89,8 @@ gulp.task('coveralls', ['instrument'], function(done) {
   });
 });
 
-gulp.task('watch', ['jshint', 'test'], function () {
-  gulp.watch(['lib/**/*.js', 'test/**/*.js'], ['jshint', 'test']);
+gulp.task('watch', ['test'], function () {
+  gulp.watch(['lib/**/*.js', 'test/**/*.js'], ['test']);
 });
 
 gulp.task('clean', function() {
